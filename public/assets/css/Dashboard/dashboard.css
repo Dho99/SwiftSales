@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Albert+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
+*{
+    font-family: "Albert Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
+
+.bg-sb{
+    background-color: #070F2B;
+}
+
+.bg-dash{
+    background-color: #B5C0D0;
+}
+
+.avatar{
+    max-width: 40px;
+    max-height: 40px;
+}
+
+.avatar-dropdown{
+    position: absolute !important;
+    top: 50px !important;
+    right: 0px !important;
+}
+
+.form-group{
+    margin-bottom: 20px !important;
+}
+
+:root{
+    --blue:    #0d6efd;
+    --indigo:  #6610f2;
+    --purple:  #6f42c1;
+    --pink:    #d63384;
+    --red:     #dc3545;
+    --orange:  #fd7e14;
+    --yellow:  #ffc107;
+    --green:   #198754;
+    --teal:    #20c997;
+    --cyan:    #0dcaf0c8;
+    --cyan-hover:    #0dcaf07b;
+}
+.w-20{
+    max-width: 19%;
+}
+
+.rotateArrow{
+    transform: rotate(180deg);
+}
+
+#parent{
+    max-height: 100vh;
+}
+
+.active{
+    background-color: var(--cyan) !important;
+    border: 0;
+}
+
+.sidebtn:hover{
+    background-color: var(--cyan-hover) !important;
+}
+
+#sidebar{
+    min-height: 100vh;
+}
+
+
+@media screen and (max-width: 1000px) {
+
+    #sidebar{
+        min-width: 250px !important;
+        overflow-y: scroll !important;
+        overflow-x: hidden !important;
+    }
+
+    #sidebarCollapser{
+        left: 260px !important;
+    }
+}
