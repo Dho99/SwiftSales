@@ -41,6 +41,10 @@ Route::middleware('auth')->group(function(){
             Route::get('/dashboard', 'index');
         });
 
+        Route::controller(ProductController::class)->group(function(){
+            Route::get('/products/{skip}/get', 'ajaxRequestProduct');
+            Route::get('/products/stock/in', 'stockInView');
+        });
         Route::resource('products', ProductController::class);
     });
 

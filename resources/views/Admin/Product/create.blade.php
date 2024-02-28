@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/Dropzone/css/dropzone.min.css') }}">
 @endsection
 @section('content')
+<div class="bg-light rounded p-4">
     <div class="alert alert-danger d-none" role="alert">
         Mohon periksa kembali data yang diperlukan !
     </div>
@@ -57,7 +58,7 @@
         <div class="form-group col-lg-12 col-md-12 col-sm-12">
             <label for="buyPrice" class="mb-2">Gambar Produk</label>
             <form action="{{ route('uploadImage', ['dirname' => 'productImage']) }}" class="dropzone" id="myDropzone">
-                @csrf
+                {{-- @csrf --}}
             </form>
         </div>
         <div class="form-group col-lg-12 col-md-12 col-sm-12">
@@ -67,6 +68,7 @@
         </div>
         <x-create-button :beforeThisUrl="$beforeThisUrl" :storeFormUrl="$storeFormUrl"></x-create-button>
     </div>
+</div>
 @endsection
 @push('scripts')
     <script src="{{ asset('assets/plugins/Select2/js/select2.min.js') }}"></script>

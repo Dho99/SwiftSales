@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use App\Http\Controllers\UrlHandler;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
@@ -26,12 +27,43 @@ class ProductController extends Controller
         $this->userData = $userController;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $products = Product::take(6)->get();
+
+
         return view('Admin.Product.list', [
             'title' => 'Daftar Produk',
-            'products' => Product::all()
+            'products' => $products,
+            'categories' => Category::all(),
         ]);
+
+    }
+
+    public function ajaxRequestProduct(Request $request, $skip){
+        $products = Product::all()->skip($skip)->take(6);
+        $productArray = [];
+        foreach($products as $product){
+            $productArray[] = [
+                'id' => $product->id,
+                'code' => $product->code,
+                'batch' => $product->batch,
+                'name' => $product->name,
+                'description' => strip_tags($product->description),
+                'supplier' => $product->supplier->name,
+                'category' => $product->category->name,
+                'images' => json_decode($product->images),
+                'stock' => $product->stock,
+                'buyPrice' => $product->buyPrice,
+                'sellPrice' => $product->sellPrice,
+                'expiredDate' => Carbon::parse($product->expiredDate)->format('d F Y'),
+            ];
+        }
+        if($request->ajax()){
+            return response()->json(['message' => 'Data berhasil dimuat ulang', 'data' => $productArray], 200);
+        }else{
+            abort(400);
+        }
     }
 
     /**
@@ -49,16 +81,12 @@ class ProductController extends Controller
         ]);
     }
 
-    // public function uploadDescriptionImage(Request $request){
-    //     if($request->hasFile('file')){
-    //         $file = $request->file('file');
-    //         $filenametostore = time() . '.' . $file->getClientOriginalExtension();
-    //         $path = $file->move(storage_path('app/public/uploads/descriptionImage'), $filenametostore);
-    //         echo $path;
-    //         exit();
-    //     }
-    // }
-
+    public function stockInView(){
+        return view('Admin.Product.stock-in', [
+            'title' => 'Stock In Produk',
+            'products' => Product::all()
+        ]);
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -167,14 +195,12 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $imagePaths = $product->images;
-        // $images = [];
+
         foreach(json_decode($imagePaths) as $image){
             $imageReplacedStoragePath = str_replace('/storage', '/public', $image);
             Storage::delete($imageReplacedStoragePath);
         }
 
-        // foreach($images as $img){
-        // }
 
         $product->delete();
         return response()->json(['message' => 'Data Produk berhasil dihapus'], 200);

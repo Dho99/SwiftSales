@@ -26,10 +26,10 @@ class DropzoneController extends Controller
         $directory = storage_path('app/public/uploads/'.$dirname);
         $filename = $file->getClientOriginalName();
         $store = $file->move($directory, $filename);
-
         $resizeImage = new ImageResize($directory.'/'.$filename);
-        $resizeImage->resize(500, 500);
-        Storage::delete($dirname.'/'.$filename);
+        $resizeImage->resizeToBestFit(500, 300);
+        Storage::delete('public/uploads/'.$dirname.'/'.$filename);
+        $filename = 'resized'.time().'-'.$filename;
         $upload_success = $resizeImage->save($directory.'/'.$filename);
 
         if ($upload_success) {

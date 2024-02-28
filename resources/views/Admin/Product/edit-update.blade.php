@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/Dropzone/css/dropzone.min.css') }}">
 @endsection
 @section('content')
+<div class="bg-light rounded p-4">
     <div class="alert alert-danger d-none" role="alert">
         Mohon periksa kembali data yang diperlukan !
     </div>
@@ -95,6 +96,7 @@
         </div>
 
     </div>
+</div>
 @endsection
 @push('scripts')
     <script src="{{ asset('assets/plugins/Select2/js/select2.min.js') }}"></script>
