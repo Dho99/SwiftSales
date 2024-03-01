@@ -135,7 +135,11 @@
 
         let scrollValue = $(document).height();
         $('div').scroll(function() {
+            if(wrapper.length < 6){
+                scrollValue += 300;
+            }
             if ($(this).scrollTop() >= scrollValue) {
+                console.log(scrollValue);
                 if($(document).width() <= 800){
                     scrollValue+=(scrollValue * 3);
                 }else{
@@ -296,8 +300,9 @@
                 </div>
                 `);
             } else {
+                Swal.close();
+                $('#cardProductWrapper').empty();
                 appendCard(data);
-
 
             };
         }

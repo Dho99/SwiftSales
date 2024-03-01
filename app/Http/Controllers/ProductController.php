@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Supplier;
+use App\Models\StockHistory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -29,14 +30,18 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::take(6)->get();
+        $products = Product::all()->take(6);
 
+        if($request->ajax()){
+            return response()->json(['data' => $products], 200);
+        }else{
+            return view('Admin.Product.list', [
+                'title' => 'Daftar Produk',
+                'products' => $products,
+                'categories' => Category::all(),
+            ]);
 
-        return view('Admin.Product.list', [
-            'title' => 'Daftar Produk',
-            'products' => $products,
-            'categories' => Category::all(),
-        ]);
+        }
 
     }
 
@@ -84,7 +89,6 @@ class ProductController extends Controller
     public function stockInView(){
         return view('Admin.Product.stock-in', [
             'title' => 'Stock In Produk',
-            'products' => Product::all()
         ]);
     }
 
@@ -124,20 +128,75 @@ class ProductController extends Controller
         }
     }
 
+    public function ajaxGetProduct(Request $request, $code)
+    {
+        if($request->ajax()){
+            $product = Product::where('code', $code)->first();
+            if(empty($product)){
+                return response('Not Found', 404);
+            }
+            $stockInHistory = StockHistory::where('productId', $product->id)->with('user','product')->get();
+            return response()->json(['data' => [$product, $stockInHistory]]);
+        }else{
+            abort(400);
+        }
+    }
+
+    public function storeNewStock(Request $request)
+    {
+        if($request->ajax()){
+            $data = $request->validate([
+                'newStock' => 'required',
+                'productCode' => 'required'
+            ]);
+
+            $newStock = $data['newStock'];
+            $oldStock = $request->oldStock;
+
+            $calculateStock = $oldStock += $newStock;
+
+            try{
+                $product = Product::where('code', $data['productCode']);
+
+                $product->update([
+                    'stock' => $calculateStock,
+                ]);
+
+                $history = StockHistory::create([
+                    'productId' => $product->get()->pluck('id')->first(),
+                    'qty' => $data['newStock'],
+                    'userId' => auth()->user()->id
+                ]);
+                return response()->json(['message' => 'Data Stock produk berhasil ditambahkan'], 201);
+            }catch(\Exception $e){
+                return response($e->getMessage(), 500);
+            }
+
+        }else{
+            abort(400);
+        }
+    }
+
     /**
      * Display the specified resource.
      */
     public function show(Product $product, Request $request)
     {
-        return view('Admin.Product.edit-update', [
-            'title' => 'Edit data Produk',
-            'product' => $product,
-            'suppliers' => Supplier::all(),
-            'categories' => Category::all(),
-            'beforeThisUrl' => $this->UrlHandler->beforeCreateUrl(),
-            'storeFormUrl' => $this->UrlHandler->storeFormUrl(),
-            'imageArray' => json_decode($product->images),
-        ]);
+        if($request->ajax()){
+            $data = $product;
+            $product['images'] = json_decode($product['images']);
+            return response()->json(['data' => $data], 200);
+        }else{
+            return view('Admin.Product.edit-update', [
+                'title' => 'Edit data Produk',
+                'product' => $product,
+                'suppliers' => Supplier::all(),
+                'categories' => Category::all(),
+                'beforeThisUrl' => $this->UrlHandler->beforeCreateUrl(),
+                'storeFormUrl' => $this->UrlHandler->storeFormUrl(),
+                'imageArray' => json_decode($product->images),
+            ]);
+        }
         // if($request->ajax()){
         //     return response()->json(['data' => $product], 200);
         // }else{

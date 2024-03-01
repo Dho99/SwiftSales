@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use App\Models\Product;
 use App\Models\Transaction;
-use App\Http\Requests\StoreTransactionRequest;
-use App\Http\Requests\UpdateTransactionRequest;
+use Illuminate\Http\Request;
+
 
 class TransactionController extends Controller
 {
@@ -13,7 +15,11 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        //
+        return view('Admin.Transactions.index', [
+            'title' => 'Create Transactions',
+            'customers' => User::where('roles', 'Customer')->get(),
+            'products' => Product::all()
+        ]);
     }
 
     /**
@@ -27,9 +33,13 @@ class TransactionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreTransactionRequest $request)
+    public function store(Request $request)
     {
-        //
+        if($request->ajax()){
+            return response()->json(['message' => 'Success throw to backend', 'data' => $request->all()]);
+        }else{
+            abort(400);
+        }
     }
 
     /**
@@ -51,7 +61,7 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateTransactionRequest $request, Transaction $transaction)
+    public function update(Request $request, Transaction $transaction)
     {
         //
     }

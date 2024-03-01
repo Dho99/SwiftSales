@@ -73,9 +73,29 @@
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
                                 class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi</span>
                         </a>
-                        <a href="javascript:void(0)"
+                        <a href="/admin/history/stock/in"
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
                                 class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in</span>
+                        </a>
+                    </div>
+
+                    <a href="javascript:void(0)" id="sidedropmenu3"
+                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i class="bi bi-wallet2 me-3"></i>
+                        <span class="fs-5">Transaksi</span> <i
+                            class="bi bi-chevron-down ms-auto" id="arrow3"></i></i>
+                    </a>
+                    <div id="sidedropcontent3" class="ps-2 d-none">
+                        <a href="/admin/transactions"
+                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
+                                class="bi bi-dash me-3"></i> <span class="fs-5">Buat Transaksi</span>
+                        </a>
+                        <a href="javascript:void(0)"
+                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
+                                class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi Dibuat</span>
+                        </a>
+                        <a href="javascript:void(0)"
+                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
+                                class="bi bi-dash me-3"></i> <span class="fs-5">Tranaksi Dibatalkan</span>
                         </a>
                     </div>
 
@@ -160,6 +180,10 @@
             $('#sidedropcontent2').toggleClass('d-none');
             $('#arrow2').toggleClass('rotateArrow');
         });
+        $('a#sidedropmenu3').on('click', function() {
+            $('#sidedropcontent3').toggleClass('d-none');
+            $('#arrow3').toggleClass('rotateArrow');
+        });
 
         function showHideSidebar() {
             $('#sidebar').toggleClass('d-none position-absolute w-100 z-3');
@@ -191,6 +215,7 @@
                     }
                 }).done(function() {
                     resetAllInput();
+                    swalClose();
                 });
             });
         }
@@ -210,6 +235,8 @@
                     error: function(xhr, error) {
                         reject(xhr, error);
                     }
+                }).done(function(){
+                    Swal.close();
                 });
             });
         }
@@ -244,7 +271,6 @@
             myDropzone.removeAllFiles(true);
         }
 
-
         function regulerTable(id) {
             let table = new DataTable(id, {
                 responsive: true,
@@ -252,6 +278,20 @@
                 ordering: false,
                 autoWidth: false,
                 destroy: true,
+            });
+        }
+
+        function printable(id) {
+            let table = new DataTable(id, {
+                responsive: true,
+                searching: true,
+                ordering: false,
+                autoWidth: false,
+                destroy: true,
+                dom: 'Bflrtip',
+                buttons: [
+                    'colvis', 'excel', 'print', 'pdf'
+                ]
             });
         }
 
@@ -269,6 +309,13 @@
 
         function formatToRupiah(number) {
             return "Rp. " + number.toLocaleString('id-ID');
+        }
+
+        function formatDate(date){
+            let myDate = new Date(date);
+            let timeString = (myDate.getMonth() + 1) + '/' + myDate.getDate() + '/' +  myDate.getFullYear();
+
+            return myDate;
         }
 
         // function closeModal(modalId){

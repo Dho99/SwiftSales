@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\DropzoneController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\StockHistoryController;
 
 /*
 |-------------------------------------------------------------at-------------
@@ -44,8 +46,17 @@ Route::middleware('auth')->group(function(){
         Route::controller(ProductController::class)->group(function(){
             Route::get('/products/{skip}/get', 'ajaxRequestProduct');
             Route::get('/products/stock/in', 'stockInView');
+            Route::get('/products/stock/in/{code}', 'ajaxGetProduct');
+            Route::post('/products/stock/in/store', 'storeNewStock');
         });
         Route::resource('products', ProductController::class);
+
+        Route::prefix('history')->group(function(){
+            Route::get('/stock/in', [StockHistoryController::class, 'index']);
+            Route::get('/transactions', [TransactionController::class, 'history']);
+        });
+
+        Route::resource('transactions', TransactionController::class);
     });
 
 

@@ -2,21 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StockHistory;
-use Illuminate\Http\Request;
+use App\Models\Cart;
+use App\Http\Requests\StoreCartRequest;
+use App\Http\Requests\UpdateCartRequest;
 
-
-class StockHistoryController extends Controller
+class CartController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('Admin.History.stock-in', [
-            'title' => 'StockIn History',
-            'histories' => StockHistory::with('user', 'product')->get()
-        ]);
+        //
     }
 
     /**
@@ -30,7 +27,7 @@ class StockHistoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreCartRequest $request)
     {
         //
     }
@@ -38,7 +35,7 @@ class StockHistoryController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(StockHistory $stockHistory)
+    public function show(Cart $cart)
     {
         //
     }
@@ -46,7 +43,7 @@ class StockHistoryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(StockHistory $stockHistory)
+    public function edit(Cart $cart)
     {
         //
     }
@@ -54,7 +51,7 @@ class StockHistoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, StockHistory $stockHistory)
+    public function update(UpdateCartRequest $request, Cart $cart)
     {
         //
     }
@@ -62,7 +59,7 @@ class StockHistoryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(StockHistory $stockHistory)
+    public function destroy(Cart $cart)
     {
         //
     }
