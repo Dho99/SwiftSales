@@ -69,7 +69,7 @@
                             class="bi bi-chevron-down ms-auto" id="arrow2"></i></i>
                     </a>
                     <div id="sidedropcontent2" class="ps-2 d-none">
-                        <a href="javascript:void(0)"
+                        <a href="{{route('transactionsHistory')}}"
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
                                 class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi</span>
                         </a>
@@ -109,7 +109,7 @@
                             class="bi bi-person me-3"></i> <span class="fs-5">Pengguna</span>
                     </a>
 
-                    <a href="javascript:void(0)"
+                    <a href="{{route('customerLists')}}"
                         class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
                             class="bi bi-journal-medical me-3"></i> <span class="fs-5">Pelanggan</span>
                     </a>
@@ -126,11 +126,11 @@
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img src="{{ asset('assets/images/Avatar/alex-suprun-1RAZcvtAxkk-unsplash.jpg') }}"
-                                        class="img-fluid avatar rounded-circle m-0 p-0" alt="">
+                                    <img src="{{ auth()->user()->profilePhoto ? auth()->user()->profilePhoto : asset('assets/images/Avatar/alex-suprun-1RAZcvtAxkk-unsplash.jpg') }}"
+                                        class="img-fluid avatar rounded m-0 p-0" alt="">
                                 </a>
                                 <ul class="dropdown-menu avatar-dropdown py-0 d-none" id="avatarTop">
-                                    <li><a class="dropdown-item" href="#"><i
+                                    <li><a class="dropdown-item" href="/user/{{auth()->user()->id}}"><i
                                                 class="bi bi-info-circle me-1"></i> Info Akun</a></li>
                                     <li><a class="dropdown-item btn text-light bg-danger w-100 rounded-0 text-start"
                                             href="/logout"><i class="bi bi-box-arrow-in-left me-1"></i> Logout</a>
@@ -150,10 +150,7 @@
                         <x-create-data></x-create-data>
                     @endif
                 </div>
-
-                {{-- <div class="container rounded p-4"> --}}
                 @yield('content')
-                {{-- </div> --}}
             </div>
         </div>
 
@@ -215,7 +212,33 @@
                     }
                 }).done(function() {
                     resetAllInput();
-                    swalClose();
+                    Swal.close();
+                });
+            });
+        }
+
+        function storeDataNoReset(url, formData) {
+            return new Promise(function(resolve, reject) {
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content'),
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function() {
+                        swalBeforeSend();
+                    },
+                    success: function(response) {
+                        resolve(response);
+                    },
+                    error: function(xhr, error) {
+                        reject(xhr, error);
+                    }
+                }).done(function() {
+                    Swal.close();
                 });
             });
         }
@@ -303,7 +326,7 @@
                 autoWidth: false,
                 destroy: true,
                 data: datas,
-                column: columns,
+                columns: columns,
             });
         }
 
@@ -312,9 +335,7 @@
         }
 
         function formatDate(date){
-            let myDate = new Date(date);
-            let timeString = (myDate.getMonth() + 1) + '/' + myDate.getDate() + '/' +  myDate.getFullYear();
-
+            let myDate = new Date(date).toLocaleString();
             return myDate;
         }
 

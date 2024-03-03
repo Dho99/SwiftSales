@@ -22,8 +22,8 @@ return new class extends Migration
             $table->enum('status', ['Process', 'Success', 'Canceled']);
             $table->timestamps();
 
-            $table->foreign('userId')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('customerId')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('userId')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('customerId')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

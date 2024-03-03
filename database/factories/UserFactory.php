@@ -32,6 +32,7 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'telephone' => fake()->phoneNumber(),
+            'profilePhoto' => fake()->imageUrl(640, 480, 'animals', true),
             'roles' => $roles[rand(0,2)],
             'email' => fake()->safeEmail(),
             'password' => Hash::make('password') //password

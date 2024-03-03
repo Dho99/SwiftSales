@@ -107,7 +107,8 @@
         $('#selectProduct').on('change', function() {
             let val = $(this).val();
             let url = productUrl + val;
-            if (val.length > 1) {
+            // console.log(val);
+            if (val) {
                 wrapper.empty();
                 findData(url).then(function(response) {
                     showProductDetails(response.data);
@@ -115,6 +116,8 @@
                     swalError(xhr.responseText);
                     console.log(error.message);
                 });
+            }else{
+                console.log(null);
             }
         });
 
@@ -154,12 +157,18 @@
             `);
         }
 
+        const coWrapper = $('#checkoutBarWrapper');
+
         function reset() {
             wrapper.empty();
+            coWrapper.empty();
             $('#selectProduct').val('').change();
+            $('#trxTable tbody, #trxTable tfoot').empty();
+            transactions = {};
+            // console.log(transactions);
+
         }
 
-        const coWrapper = $('#checkoutBarWrapper');
 
         function addToCart(id) {
             reset();
@@ -172,45 +181,72 @@
             });
         }
 
+
+
         // let idProductArr = [];
 
         function appendToCart(data) {
             if (data.id in transactions) {
                 addQty(data.id);
             } else {
-                transactions[data.id] = {
-                    productId: data.id,
-                    code: data.code,
-                    name: data.name,
-                    sellPrice: data.sellPrice,
-                    qty: 1,
-                };
-                // console.log(transactions);
-                addToTable();
-                coWrapper.append(`
-                    <div class="container bg-body shadow rounded row m-0 p-2 mb-3" id="productCheckout${data.id}">
-                        <img src="${data.images[0]}" class="col-5 img-fluid ps-0 rounded" alt="">
-                        <div class="col-7 ps-0">
-                            <div>${data.code} | ${data.name}</div>
-                            <div>${formatToRupiah(data.sellPrice)}</div>
-                            <div class="input-group mb-2">
-                                <button class="btn btn-outline-danger" onclick="reduceQty('${data.id}')"><i class="bi bi-dash-circle"></i></button>
-                                <input type="number" class="form-control text-center" placeholder="Username" aria-label="" value="1" id="inputQty${data.id}">
-                                <button class="btn btn-outline-primary" onclick="addQty('${data.id}')"><i class="bi bi-plus-circle"></i></button>
+                if(data.stock < 1){
+                    swalError('Stok Produk sedang Kosong, Tidak dapat menambahkan ke keranjang');
+                }else{
+                    transactions[data.id] = {
+                        productId: data.id,
+                        code: data.code,
+                        name: data.name,
+                        sellPrice: data.sellPrice,
+                        qty: 1,
+                        stock: data.stock
+                    };
+                    addToTable();
+                    coWrapper.append(`
+                        <div class="container bg-body shadow rounded row m-0 p-2 mb-3" id="productCheckout${data.id}">
+                            <img src="${data.images[0]}" class="col-5 img-fluid ps-0 rounded" alt="">
+                            <div class="col-7 ps-0">
+                                <div>${data.code} | ${data.name}</div>
+                                <div>${formatToRupiah(data.sellPrice)}</div>
+                                <div class="input-group mb-2">
+                                    <button class="btn btn-outline-danger" onclick="reduceQty('${data.id}')"><i class="bi bi-dash-circle"></i></button>
+                                    <input type="number" class="form-control text-center" placeholder="Username" aria-label="" value="1" id="inputQty${data.id}" oninput="checkInputValue('${data.id}')">
+                                    <button class="btn btn-outline-primary" onclick="addQty('${data.id}')"><i class="bi bi-plus-circle"></i></button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `);
+                    `);
+                }
             }
         }
+
+        function checkInputValue(id){
+            let inputEl = $(`#inputQty${id}`);
+            let inputVal = parseInt(inputEl.val());
+            if(inputVal < 1 || isNaN(inputVal)){
+                inputEl.val(1);
+                inputVal = 1;
+            }
+            if(inputVal > transactions[id].stock){
+                swalError('Stok produk tidak mencukupi');
+                inputVal = transactions[id].stock;
+                inputEl.val(inputVal);
+            }
+            transactions[id].qty = inputVal;
+            addToTable();
+        }
+
+
 
         function addQty(id) {
             let productQty = $(`#inputQty${id}`);
             let cVal = parseInt(productQty.val());
             let nVal = cVal += 1;
+            if(transactions[id].stock < nVal){
+                swalError('Stok produk tidak mencukupi');
+                nVal = transactions[id].stock;
+            }
             productQty.val(nVal);
             transactions[id].qty = nVal;
-            console.log(transactions);
             addToTable();
         }
 
@@ -233,7 +269,7 @@
             } else {
                 nVal = cVal -= 1;
                 transactions[id].qty = nVal;
-                console.log(transactions);
+                // console.log(transactions);
                 addToTable();
             }
             productQty.val(nVal);
@@ -254,6 +290,7 @@
 
 
         function addToTable() {
+            subtotal = 0;
             productIdArray = [];
             quantityArray = [];
             total = [];
@@ -262,7 +299,7 @@
 
 
             let table = $('#trxTable tbody');
-            let tfoot = $('#trxTable tfoot')
+            let tfoot = $('#trxTable tfoot');
             table.empty();
             tfoot.empty();
 
@@ -279,9 +316,9 @@
                     <td>${i+=1}</td>
                     <td>${transactions[key].code}</td>
                     <td>${transactions[key].name}</td>
-                    <td>${transactions[key].sellPrice}</td>
+                    <td>${formatToRupiah(transactions[key].sellPrice)}</td>
                     <td>${transactions[key].qty}</td>
-                    <td>${transactions[key].qty * transactions[key].sellPrice}</td>
+                    <td>${formatToRupiah(transactions[key].qty * transactions[key].sellPrice)}</td>
                     </tr>
                     `);
             }
@@ -291,7 +328,7 @@
                 <tr>
                     <th colspan="4"></th>
                     <th>Grand Total</th>
-                    <th>${grandTotal}</th>
+                    <th>${formatToRupiah(grandTotal)}</th>
                 </tr>
                 `);
 
@@ -308,14 +345,14 @@
                 const url = '{{url()->current()}}';
                 let formData = new FormData();
                 formData.append('customerId', custIdVal.val());
-                formData.append('productId', productIdArray);
-                formData.append('quantity', quantityArray);
-                formData.append('total', total);
+                formData.append('productId', JSON.stringify(productIdArray));
+                formData.append('quantity', JSON.stringify(quantityArray));
+                formData.append('total', JSON.stringify(total));
                 formData.append('subtotal', subtotal);
 
                 storeData(url, formData).then(function(response){
                     swalSuccess(response.message);
-                    console.log(response.data);
+                    reset();
                 }).catch(function(xhr, error){
                     swalError(xhr.responseText);
                 });

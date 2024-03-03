@@ -67,8 +67,15 @@
     min-height: 100vh;
 }
 
+.profilePhotoDetails{
+    width: 25% !important;
+}
+
 
 @media screen and (max-width: 1000px) {
+    .profilePhotoDetails{
+        width: 50% !important;
+    }
 
     #sidebar{
         min-width: 250px !important;

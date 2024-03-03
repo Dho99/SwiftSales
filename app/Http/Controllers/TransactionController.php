@@ -18,7 +18,7 @@ class TransactionController extends Controller
         return view('Admin.Transactions.index', [
             'title' => 'Create Transactions',
             'customers' => User::where('roles', 'Customer')->get(),
-            'products' => Product::all()
+            'products' => Product::all(),
         ]);
     }
 
@@ -36,7 +36,15 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         if($request->ajax()){
-            return response()->json(['message' => 'Success throw to backend', 'data' => $request->all()]);
+            $data = $request->all();
+            $data['userId'] = auth()->user()->id;
+            $data['status'] = 'Success';
+            try{
+                Transaction::create($data);
+                return response()->json(['message' => 'Data Transaksi berhasil disimpan'],200);
+            }catch(\Exception $e){
+                return response($e->getMessage(), 400);
+            }
         }else{
             abort(400);
         }
@@ -72,5 +80,16 @@ class TransactionController extends Controller
     public function destroy(Transaction $transaction)
     {
         //
+    }
+
+    public function history(Request $request){
+        $transactions = Transaction::all();
+        if($request->ajax()){
+
+        }else{
+            return view('Admin.History.transactions', [
+                'title' => 'Riwayat Transaksi'
+            ]);
+        }
     }
 }

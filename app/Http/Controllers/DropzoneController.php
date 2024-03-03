@@ -46,7 +46,7 @@ class DropzoneController extends Controller
 
         $delete = Storage::delete('public/uploads/'.$dirname.'/'.$filename);
 
-        return response()->json(['file' => $filename], 200);
+        return response()->json(['file' => $data], 200);
     }
 
 }
