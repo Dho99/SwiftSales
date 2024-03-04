@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DropzoneController;
+use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\StockHistoryController;
@@ -32,9 +33,11 @@ Route::middleware([])->controller(AuthController::class)->group(function(){
     Route::get('/logout', 'logout');
 });
 
+Route::get('/register', [UserController::class, 'register'])->name('register');
+Route::post('/register', [UserController::class, 'storeRegisteredAccount'])->name('registered');
+
+
 Route::middleware('auth')->group(function(){
-
-
     Route::resource('user', UserController::class);
 
     Route::prefix('image')->controller(DropzoneController::class)->group(function(){
@@ -54,20 +57,26 @@ Route::middleware('auth')->group(function(){
 
         Route::controller(ProductController::class)->group(function(){
             Route::get('/products/{skip}/get', 'ajaxRequestProduct');
-            Route::get('/products/stock/in', 'stockInView');
+            Route::get('/products/stock/in', 'stockInView')->name('stockinProduct');
             Route::get('/products/stock/in/{code}', 'ajaxGetProduct');
             Route::post('/products/stock/in/store', 'storeNewStock');
         });
         Route::resource('products', ProductController::class);
 
+        Route::resource('supplier', SupplierController::class);
+
+        Route::resource('transactions', TransactionController::class);
+
+        Route::get('/transactions/print/{transaction}', [TransactionController::class, 'print']);
+
+
         Route::prefix('history')->group(function(){
             Route::get('/stock/in', [StockHistoryController::class, 'index']);
-            Route::get('/transactions', [TransactionController::class, 'history'])->name('transactionsHistory');
+            // Route::get('/transactions', [TransactionController::class, 'history'])->name('transactionsHistory');
         });
 
         Route::resource('transactions', TransactionController::class);
     });
-
 
 });
 

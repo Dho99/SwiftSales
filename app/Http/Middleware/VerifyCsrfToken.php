@@ -14,5 +14,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'http://127.0.0.1:8000/admin/upload/description/image',
         'http://127.0.0.1:8000/image/upload/*',
+        // 'http://127.0.0.1:8000/user',
     ];
 }

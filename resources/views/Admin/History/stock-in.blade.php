@@ -7,7 +7,8 @@
                     <th>No</th>
                     <th>Kode Produk</th>
                     <th>Nama Produk</th>
-                    <th>Jumlah</th>
+                    <th>Jumlah Sebelumnya</th>
+                    <th>Jumlah Aktual</th>
                     <th>Nama Pengguna</th>
                     <th>Waktu Pelaksanaan</th>
                 </tr>
@@ -18,7 +19,8 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $history->product->code }}</td>
                         <td>{{ $history->product->name }}</td>
-                        <td>{{ $history->qty }} Buah</td>
+                        <td>{{ $history->before }} Buah</td>
+                        <td>{{ $history->after }} Buah</td>
                         <td>{{ $history->user->name }}</td>
                         <td>{{ $history->created_at->format('d F Y H:i') }}</td>
                     </tr>

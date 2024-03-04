@@ -27,6 +27,7 @@
 </style>
 
 <body class="bg-secondary bg-opacity-25 overflow-hidden">
+    @if(auth()->check())
     <div class="d-flex w-100" id="parent">
 
         <i class="bi bi-x d-lg-none d-md-block h3 mb-0 position-absolute" id="sidebarCollapser"
@@ -69,7 +70,7 @@
                             class="bi bi-chevron-down ms-auto" id="arrow2"></i></i>
                     </a>
                     <div id="sidedropcontent2" class="ps-2 d-none">
-                        <a href="{{route('transactionsHistory')}}"
+                        <a href="/admin/transactions"
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
                                 class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi</span>
                         </a>
@@ -85,34 +86,30 @@
                             class="bi bi-chevron-down ms-auto" id="arrow3"></i></i>
                     </a>
                     <div id="sidedropcontent3" class="ps-2 d-none">
-                        <a href="/admin/transactions"
+                        <a href="/admin/transactions/create"
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
                                 class="bi bi-dash me-3"></i> <span class="fs-5">Buat Transaksi</span>
                         </a>
-                        <a href="javascript:void(0)"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi Dibuat</span>
-                        </a>
-                        <a href="javascript:void(0)"
+                        {{-- <a href="javascript:void(0)"
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
                                 class="bi bi-dash me-3"></i> <span class="fs-5">Tranaksi Dibatalkan</span>
-                        </a>
+                        </a> --}}
                     </div>
 
-                    <a href="javascript:void(0)"
+                    <a href="/admin/supplier"
                         class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
                             class="bi bi-truck me-3"></i> <span class="fs-5">Supplier</span>
                     </a>
 
-                    <a href="javascript:void(0)"
+                    <a href="/user"
                         class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
                             class="bi bi-person me-3"></i> <span class="fs-5">Pengguna</span>
                     </a>
 
-                    <a href="{{route('customerLists')}}"
+                    {{-- <a href="{{route('customerLists')}}"
                         class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
                             class="bi bi-journal-medical me-3"></i> <span class="fs-5">Pelanggan</span>
-                    </a>
+                    </a> --}}
                 </div>
             </div>
         </div>
@@ -146,8 +143,14 @@
             <div class="lg-container md-container-fluid h-100 p-3 overflow-auto">
                 <div class="container bg-light rounded py-3 my-2 d-flex shadow-sm">
                     <h3 class="fw-bold my-auto">{{ $title }}</h3>
-                    @if (Request::is('admin/products'))
+                    @if (Request::is('admin/products', 'admin/customer/list'))
                         <x-create-data></x-create-data>
+                    @endif
+                    @if(Request::is('admin/history/stock/in'))
+                        <a href="{{route('stockinProduct')}}" class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light"><i class="bi bi-plus-circle me-1"></i> Tambah Data</a>
+                    @endif
+                    @if(Request::is('user'))
+                        <button class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light" onclick="createUser()"><i class="bi bi-plus-circle me-1"></i> Tambah Data</button>
                     @endif
                 </div>
                 @yield('content')
@@ -155,8 +158,9 @@
         </div>
 
     </div>
-
-
+    @else
+        @yield('nonauth')
+    @endif
 
 
     <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.js') }}"></script>
@@ -249,6 +253,7 @@
                 $.ajax({
                     url: url,
                     method: 'GET',
+                    cache: false,
                     beforeSend: function() {
                         swalBeforeSend();
                     },
@@ -312,6 +317,22 @@
                 autoWidth: false,
                 destroy: true,
                 dom: 'Bflrtip',
+                buttons: [
+                    'colvis', 'excel', 'print', 'pdf'
+                ]
+            });
+        }
+
+        function printableWColumns(id, data,columns) {
+            let table = new DataTable(id, {
+                responsive: true,
+                searching: true,
+                ordering: false,
+                autoWidth: false,
+                destroy: true,
+                dom: 'Bflrtip',
+                data: data,
+                columns: columns,
                 buttons: [
                     'colvis', 'excel', 'print', 'pdf'
                 ]

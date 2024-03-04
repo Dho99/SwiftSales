@@ -31,6 +31,7 @@ class UserFactory extends Factory
 
         return [
             'name' => fake()->name(),
+            'code' => mt_rand(0, 9999),
             'telephone' => fake()->phoneNumber(),
             'profilePhoto' => fake()->imageUrl(640, 480, 'animals', true),
             'roles' => $roles[rand(0,2)],

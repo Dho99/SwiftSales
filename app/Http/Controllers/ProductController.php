@@ -89,6 +89,7 @@ class ProductController extends Controller
     public function stockInView(){
         return view('Admin.Product.stock-in', [
             'title' => 'Stock In Produk',
+            'recomendations' => Product::where('stock', '<=', 10)->get(),
         ]);
     }
 
@@ -159,12 +160,13 @@ class ProductController extends Controller
                 $product = Product::where('code', $data['productCode']);
 
                 $product->update([
-                    'stock' => $calculateStock,
+                    'stock' => $calculateStock
                 ]);
 
                 $history = StockHistory::create([
                     'productId' => $product->get()->pluck('id')->first(),
-                    'qty' => $data['newStock'],
+                    'before' => $request->oldStock,
+                    'after' => $calculateStock,
                     'userId' => auth()->user()->id
                 ]);
                 return response()->json(['message' => 'Data Stock produk berhasil ditambahkan'], 201);

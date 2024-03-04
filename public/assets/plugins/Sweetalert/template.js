@@ -31,7 +31,7 @@ function swalConfirm(message){
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!"
+            confirmButtonText: "Ya"
           }).then((result) => {
             if (result.isConfirmed) {
               Swal.fire({
@@ -39,6 +39,25 @@ function swalConfirm(message){
                 text: "Data telah berhasil dihapus !",
                 icon: "success"
               });
+                resolve(true);
+            }else{
+                reject(false);
+            }
+          });
+    });
+}
+
+function swalConfirmWithoutDelete(message){
+    return new Promise(function(resolve, reject){
+        Swal.fire({
+            title: "Apakah anda benar - benar yakin ?",
+            text: message,
+            icon: "question",
+            showCancelButton: true,
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya"
+          }).then((result) => {
+            if (result.isConfirmed) {
                 resolve(true);
             }else{
                 reject(false);

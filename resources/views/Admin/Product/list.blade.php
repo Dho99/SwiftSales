@@ -41,12 +41,16 @@
                         <div class="card-body bg-body rounded">
                             <table class="table table-responsive" id="productable">
                                 <tr>
+                                    <th>Kode Produk:</th>
+                                    <td id="productName">{{ $product->code }}</td>
+                                </tr>
+                                <tr>
                                     <th>Nama Produk:</th>
                                     <td id="productName">{{ $product->name }}</td>
                                 </tr>
                                 <tr>
-                                    <th>Harga Beli:</th>
-                                    <td id="productBuyPrice">@currency($product->buyPrice)</td>
+                                    <th>Stok</th>
+                                    <td id="productSellPrice">{{$product->stock}}</td>
                                 </tr>
                                 <tr>
                                     <th>Harga Jual:</th>
@@ -181,12 +185,16 @@
                             <div class="card-body bg-body rounded">
                                 <table class="table table-responsive" id="productable">
                                     <tr>
+                                        <th>Kode Produk:</th>
+                                        <td id="productName">${data.code}</td>
+                                    </tr>
+                                    <tr>
                                         <th>Nama Produk:</th>
                                         <td id="productName">${data.name}</td>
                                     </tr>
                                     <tr>
-                                        <th>Harga Beli:</th>
-                                        <td id="productBuyPrice">${formatToRupiah(data.buyPrice)}</td>
+                                        <th>Stok</th>
+                                        <td id="productBuyPrice">${data.stock}</td>
                                     </tr>
                                     <tr>
                                         <th>Harga Jual:</th>

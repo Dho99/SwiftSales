@@ -3,17 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
-use App\Http\Requests\StoreSupplierRequest;
-use App\Http\Requests\UpdateSupplierRequest;
+use Illuminate\Http\Request;
+
 
 class SupplierController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if($request->ajax()){
+            $supplier = Supplier::all();
+            return response()->json(['data' => $supplier], 200);
+        }else{
+            return view('Admin.Supplier.list', [
+                'title' => 'Daftar Supplier'
+            ]);
+        }
     }
 
     /**
@@ -27,7 +34,7 @@ class SupplierController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreSupplierRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -35,9 +42,13 @@ class SupplierController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Supplier $supplier)
+    public function show(Supplier $supplier, Request $request)
     {
-        //
+        if($request->ajax()){
+            return response()->json(['data' => $supplier], 200);
+        }else{
+            return view('errors.404');
+        }
     }
 
     /**
@@ -51,7 +62,7 @@ class SupplierController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateSupplierRequest $request, Supplier $supplier)
+    public function update(Request $request, Supplier $supplier)
     {
         //
     }

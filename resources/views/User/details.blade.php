@@ -44,8 +44,11 @@
                 </div>
             </div>
             <div class="col-lg-12 row m-0 p-0">
-                <div class="col-lg-3 col-md-6 col-12 ms-auto">
-                    <button class="btn btn-primary w-100" onclick="changeToEdit()" id="editBtn">Edit Data</button>
+                <div class="col-lg-3 col-md-6 col-12 order-lg-1 order-md-1 order-2">
+                    <button class="btn btn-danger w-100 my-1" onclick="deleteAccount('{{$user->id}}')" data-id="{{$user->id}}">Hapus Akun</button>
+                </div>
+                <div class="col-lg-3 col-md-6 col-12 ms-auto order-lg-2 order-md-2 order-1">
+                    <button class="btn btn-primary w-100 my-1" onclick="changeToEdit()" id="editBtn">Edit Akun</button>
                 </div>
             </div>
         </div>
@@ -59,7 +62,6 @@
         function editProfilePhoto() {
             $('#profilePhotoInput').click();
         }
-
 
         let click = 0;
 
@@ -111,7 +113,6 @@
         }
 
 
-
         $('#profilePhotoInput').on('change', function() {
             const file = $(this)[0].files[0];
             const reader = new FileReader();
@@ -145,6 +146,26 @@
                 uploadedImage = currentProfilePhoto;
             }).catch(function(xhr, error) {
                 swalError(xhr.responseText);
+            });
+        }
+
+        function deleteAccount(id){
+            const url = '/user/'+id;
+            swalConfirm('Apakah anda yakin akan menghapus data Akun ?').then(function(result){
+                if(result){
+                    swalConfirm('Semua data yang berkaitan dengan akun anda akan dihapus secara Permanen').then(function(result){
+                        if(result){
+                            deleteData(url, '').then(function(response){
+                                swalSuccess(response.message);
+                                setTimeout(() => {
+                                    window.location.href = '/';
+                                }, 1000);
+                            }).catch(function(xhr, error){
+                                swalError(xhr.responseText);
+                            });
+                        }
+                    });
+                }
             });
         }
     </script>

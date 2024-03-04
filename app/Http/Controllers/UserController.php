@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Validator;
 
 
 class UserController extends Controller
@@ -28,9 +29,16 @@ class UserController extends Controller
         }
     }
 
-    public function index()
+    public function index(Request $request)
     {
-
+        $users = User::whereNot('id', auth()->user()->id)->get();
+        if($request->ajax()){
+            return response()->json(['users' => $users], 200);
+        }else{
+            return view('Admin.Users.lists',[
+                'title' => 'Daftar Pelanggan',
+            ]);
+        }
     }
 
     /**
@@ -128,5 +136,57 @@ class UserController extends Controller
             return response($e->getMessage(), 400);
         }
 
+    }
+
+    public function register()
+    {
+        return view('User.register', [
+            'title' => 'Daftarkan Akun'
+        ]);
+    }
+
+    public function storeRegisteredAccount(Request $request)
+    {
+        $request->flashOnly(['name', 'email', 'telephone']);
+
+        $data = $request->all();
+        $data['code'] = mt_rand(0, 999999);
+
+        if(isset($request->roles)){
+            $data['roles'] = $request->roles;
+        }else{
+            $data['roles'] = 'Customer';
+        }
+
+        $validator = Validator::make($data, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'telephone' => 'required|unique:users',
+            'password' => 'required',
+            'roles' => 'required',
+            'code' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return response($validator->errors(), 500);
+        }
+
+        $validated = $validator->validated();
+        $validated['profilePhoto'] = '';
+
+        try{
+            User::create($validated);
+            if($request->ajax()){
+                return response()->json(['message' => 'Data berhasil Ditambahkan'], 201);
+            }else{
+                return back()->with('success', 'Data anda berhasil Terdaftar, silakan Login');
+            }
+        }catch(\Exception $e){
+            if($request->ajax()){
+                return response($e->getMessage(), 400);
+            }else{
+                return back()->withErrors($e->getMessage());
+            }
+        }
     }
 }

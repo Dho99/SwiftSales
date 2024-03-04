@@ -139,6 +139,10 @@
                                                 <th>Harga :</th>
                                                 <td>${formatToRupiah(data.sellPrice)}</td>
                                             </tr>
+                                            <tr>
+                                                <th>Stok :</th>
+                                                <td>${data.stock}</td>
+                                            </tr>
                                         </thead>
                                     </table>
                                 </div>
@@ -165,17 +169,17 @@
             $('#selectProduct').val('').change();
             $('#trxTable tbody, #trxTable tfoot').empty();
             transactions = {};
-            // console.log(transactions);
 
         }
 
 
         function addToCart(id) {
-            reset();
+            // reset();
             let url = productUrl + id;
             findData(url).then(function(response) {
                 appendToCart(response.data);
                 $('#trashBtn, #prosesTransaksi').removeClass('disabled');
+                wrapper.empty();
             }).catch(function(xhr, error) {
                 swalError(xhr.responseText);
             });
@@ -342,7 +346,7 @@
                 custIdVal.addClass('is-invalid');
                 swalError('Data Pelanggan tidak boleh kosong');
             }else{
-                const url = '{{url()->current()}}';
+                const url = '/admin/transactions';
                 let formData = new FormData();
                 formData.append('customerId', custIdVal.val());
                 formData.append('productId', JSON.stringify(productIdArray));
@@ -352,6 +356,12 @@
 
                 storeData(url, formData).then(function(response){
                     swalSuccess(response.message);
+                    swalConfirmWithoutDelete('Apakah anda ingin mencetak Struk / Invoice ?').then(function(result){
+                        if(result){
+                            window.location.href = '/admin/transactions/print/'+response.id;
+                        }
+                    });
+                    reset();
                     reset();
                 }).catch(function(xhr, error){
                     swalError(xhr.responseText);

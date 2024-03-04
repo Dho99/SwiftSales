@@ -11,7 +11,33 @@
     </div>
 
     <div id="searchProductWrapper">
-
+        <div class="container bg-light rounded py-3 px-4 mt-2">
+            <p>Rekomendasi Produk untuk Stock-in</p>
+            <table class="table table-responsive table-bordered">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode Produk</th>
+                        <th>Nama Produk</th>
+                        <th>Stok</th>
+                        <th>Stok-in Terakhir</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($recomendations as $item)
+                    <tr>
+                        <td>{{$loop->iteration}}</td>
+                        <td>{{ $item->code }}</td>
+                        <td>{{ $item->name }}</td>
+                        <td>{{ $item->stock }}</td>
+                        <td>{{ $item->updated_at->format('d F Y H:i') }}</td>
+                        <td><button class="badge btn btn-primary" onclick="insertToInput('{{$item->code}}')">Stock-in</button></td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
     {{-- </div> --}}
 @endsection
@@ -32,10 +58,20 @@
             }
         });
 
+        function insertToInput(code)
+        {
+            swalConfirmWithoutDelete('Lanjutkan Stock-in produk ini ?').then(function(result){
+                if(result){
+                    $('#codeInput').val(code);
+                    $('#searchBtn').click();
+                }
+            });
+        }
+
         function displayData(data) {
             let product = data[0];
             let history = data[1];
-            $('#searchProductWrapper').append(`
+            $('#searchProductWrapper').empty().append(`
             <div class="bg-light container rounded mt-2 p-3">
                  <h5 class="text-center fw-bold">Hasil Pencarian Produk ${product.name}</h5>
 
@@ -83,7 +119,8 @@
                             <th>Kode Produk</th>
                             <th>Nama Produk</th>
                             <th>Nama Petugas</th>
-                            <th>Jumlah</th>
+                            <th>Jumlah Sebelumnya</th>
+                            <th>Jumlah Aktual</th>
                             <th>Waktu Proses</th>
                         </tr>
                     </thead>
@@ -94,7 +131,8 @@
                                     <td>${h.product.code}</td>
                                     <td>${h.product.name}</td>
                                     <td>${h.user.name}</td>
-                                    <td>${h.qty}</td>
+                                    <td>${h.before}</td>
+                                    <td>${h.after}</td>
                                     <td>${formatDate(h.created_at)}</td>
                                 </tr>`
                         ).join('')}
