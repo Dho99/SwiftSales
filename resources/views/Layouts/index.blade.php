@@ -30,14 +30,14 @@
     @if(auth()->check())
     <div class="d-flex w-100" id="parent">
 
-        <i class="bi bi-x d-lg-none d-md-block h3 mb-0 position-absolute" id="sidebarCollapser"
-            style="left: 180px; top: 20px;" onclick="showHideSidebar()"></i>
-        <div class="w-20 bg-sb d-lg-flex d-none vh-100 shadow-lg" id="sidebar">
+        <i class="bi bi-x d-none h3 mb-0 position-absolute bg-sb p-1 z-3 shadow rounded text-light" id="sidebarCollapser"
+            style="left: 170px; top: 20px;" onclick="showHideSidebar()"></i>
+        <div class="w-20 bg-sb d-lg-flex d-none vh-100 shadow-lg overflow-auto" id="sidebar">
             <div class="d-flex flex-column px-3 py-3">
                 <img src="{{ asset('assets/images/Logo/swiftsales-logo.png') }}" class="img-fluid mt-2 mb-5"
-                    alt="">
+                alt="">
 
-                <div class="mt-5">
+                <div class="mt-5 pb-4">
 
                     <a href="/admin/dashboard"
                         class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Dashboard' ? 'active' : '' }}"><i
@@ -188,6 +188,7 @@
 
         function showHideSidebar() {
             $('#sidebar').toggleClass('d-none position-absolute w-100 z-3');
+            $('#sidebarCollapser').toggleClass('d-none');
         };
 
         $('a.dropdown-toggle').on('click', function() {

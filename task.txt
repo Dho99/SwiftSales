@@ -1,0 +1,4 @@
+1. fix sidebar position to relative while ta lg breakpoints with jquery onresize event
+2. fix responsiveness layout at create transactions page
+3. add Interface for short information at dashboard like chart, reminder stock, etc.
+4. At transaction history list, add short information about profit, and total orders
