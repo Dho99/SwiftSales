@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 
 class TransactionController extends Controller
@@ -15,13 +16,7 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
-        // if(isset($startDate) && isset($endDate)){
-        //     $startDate = $startDate;
-        //     $endDate = $endDate;
-        // }else{
         $endDate = now();
-        //     $endDate = now()->subdays(30)->endOfDay();
-        // }
         $startDate = now()->subdays(30)->endOfDay();
         $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->with('user', 'customer')->get();
         if($request->ajax()){
@@ -32,6 +27,14 @@ class TransactionController extends Controller
             ]);
         }
     }
+
+    // public function filterByMonth(Request $request, $month, $year)
+    // {
+    //     $transactions = Transaction::whereMonth('created_at', $month)->whereYear('created_at',$year)->with('user', 'customer')->get();
+    //     if($request->ajax()){
+    //         return response()->json(['transactions' => $transactions]);
+    //     }
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -52,6 +55,21 @@ class TransactionController extends Controller
     {
         if($request->ajax()){
             $data = $request->all();
+            $checkUser = User::where('id', $request->customerId)->first();
+            if(isset($checkUser)){
+                $data['customerId'] = $checkUser->id;
+            }else{
+                $newUser = User::create([
+                    'name' => $request->customerId,
+                    'code' => mt_rand(0, 9999),
+                    'telephone' => fake()->phoneNumber(),
+                    'profilePhoto' => fake()->imageUrl(640, 480, 'animals', true),
+                    'roles' => 'Customer',
+                    'email' => fake()->safeEmail(),
+                    'password' => Hash::make('password')
+                ]);
+                $data['customerId'] = $newUser->id;
+            }
             $data['userId'] = auth()->user()->id;
             $data['status'] = 'Success';
             $data['code'] = 'TRXN'.mt_rand(0, 9999999999);
@@ -144,9 +162,27 @@ class TransactionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(Transaction $transaction, Request $request)
     {
-        //
+        if($request->ajax()){
+            $products = $transaction->productId;
+
+            foreach(json_decode($products) as $key => $product){
+                $getProduct = Product::where('id', $product)->first();
+                $currentStock = intval($getProduct->stock);
+                $returnStock = intval(json_decode($transaction->quantity)[$key]);
+                $calculateStock = $currentStock + $returnStock;
+                $getProduct->update([
+                    'stock' => $calculateStock
+                ]);
+            }
+
+            $transaction->update(['status' => 'Canceled']);
+        }
+
+        return response()->json(['message' => 'Transaksi berhasil dibatalkan, stok produk telah dikembalikan'], 200);
+
+
     }
 
     public function history(Request $request){

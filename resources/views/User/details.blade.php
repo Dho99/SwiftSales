@@ -15,6 +15,7 @@
         </div>
         <img src="" class="img-fluid border" id="preview" alt="">
         <div class="row">
+            {{-- {{auth()->user()}} --}}
             <div class="col-lg-6">
                 <div class="form-group">
                     <label for="email">Alamat Email</label>
@@ -43,9 +44,11 @@
                         class="form-control">
                 </div>
             </div>
+            <div id="passwordEdit" class="row m-0 p-0 w-100"></div>
             <div class="col-lg-12 row m-0 p-0">
                 <div class="col-lg-3 col-md-6 col-12 order-lg-1 order-md-1 order-2">
-                    <button class="btn btn-danger w-100 my-1" onclick="deleteAccount('{{$user->id}}')" data-id="{{$user->id}}">Hapus Akun</button>
+                    <button class="btn btn-danger w-100 my-1" onclick="deleteAccount('{{ $user->id }}')"
+                        data-id="{{ $user->id }}">Hapus Akun</button>
                 </div>
                 <div class="col-lg-3 col-md-6 col-12 ms-auto order-lg-2 order-md-2 order-1">
                     <button class="btn btn-primary w-100 my-1" onclick="changeToEdit()" id="editBtn">Edit Akun</button>
@@ -57,16 +60,55 @@
 @push('scripts')
     <script>
         const currentProfilePhoto = '{{ auth()->user()->profilePhoto }}';
-        let uploadedImage;
+        let uploadedImage = false;
 
         function editProfilePhoto() {
             $('#profilePhotoInput').click();
         }
 
+
+
+        let passVal;
+
+        function assignPass() {
+            passVal = $('#password').val();
+        };
+
+        function validatePass() {
+            const val = $('#confirmPassword').val();
+            const errorMessage = $('.invalid-feedback');
+            if (val !== passVal) {
+                $('#confirmPassword').addClass('is-invalid');
+                errorMessage.text('Password tidak sama, Masukkan password dengan benar dan teliti');
+            } else {
+                $('#confirmPassword').removeClass('is-invalid');
+                errorMessage.text('');
+                $('#editBtn').removeAttr('disabled');
+            }
+        };
+
+
         let click = 0;
 
         function changeToEdit() {
             click += 1;
+            $('#passwordEdit').append(`
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="telephone">Ubah Password</label>
+                    <input type="password" name="password" id="password" value="" onchange="assignPass()" class="form-control">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="form-group">
+                    <label for="roles">Konfirmasi Password</label>
+                    <input type="password" name="password" id="confirmPassword" oninput="validatePass()" value=""
+                        class="form-control">
+                    <div class="invalid-feedback"><div>
+                </div>
+            </div>
+            `);
+
             $('.profilePhotoDetails').attr('id', 'profilePhoto');
             $('input').removeAttr('readonly');
             $('#profilePhoto').on('mouseenter', function() {
@@ -76,18 +118,20 @@
                 $('#icon').addClass('d-none');
                 $(this).find('img').removeClass('border border-primary');
             });
+            $('#editBtn').attr('disabled', true);
             $('#editBtn').text('Simpan Perubahan');
             if (click > 1) {
                 let imgFile;
-                if(uploadedImage.length < 1){
+                if (!uploadedImage) {
                     imgFile = currentProfilePhoto;
-                }else{
-                    imgFile = '/storage/uploads/profilePhoto/'+uploadedImage;
+                } else {
+                    imgFile = '/storage/uploads/profilePhoto/' + uploadedImage;
                 }
                 const emailInput = $('#email');
                 const nameInput = $('#name');
                 const telephoneInput = $('#telephone');
 
+                // console.log(imgFile);
                 if (imgFile.length < 1 && emailInput.val().length < 1 && nameInput.val().length < 1 &&
                     telephoneInput.val().length < 1) {
                     swalError('Data yang diperlukan tidak boleh kosong');
@@ -99,6 +143,7 @@
                     formData.append('email', emailInput.val());
                     formData.append('name', nameInput.val());
                     formData.append('telephone', telephoneInput.val());
+                    formData.append('password', passVal);
 
                     storeDataNoReset(currUrl, formData).then(function(response) {
                         swalSuccess(response.message);
@@ -108,9 +153,12 @@
                 }
                 $('input').attr('readonly', true);
                 $('#editBtn').text('Edit Data');
+                $('#passwordEdit').empty();
+                $('#editBtn').attr('disabled', true);
                 click = 0;
             }
         }
+
 
 
         $('#profilePhotoInput').on('change', function() {
@@ -149,22 +197,23 @@
             });
         }
 
-        function deleteAccount(id){
-            const url = '/user/'+id;
-            swalConfirm('Apakah anda yakin akan menghapus data Akun ?').then(function(result){
-                if(result){
-                    swalConfirm('Semua data yang berkaitan dengan akun anda akan dihapus secara Permanen').then(function(result){
-                        if(result){
-                            deleteData(url, '').then(function(response){
-                                swalSuccess(response.message);
-                                setTimeout(() => {
-                                    window.location.href = '/';
-                                }, 1000);
-                            }).catch(function(xhr, error){
-                                swalError(xhr.responseText);
-                            });
-                        }
-                    });
+        function deleteAccount(id) {
+            const url = '/user/' + id;
+            swalConfirm('Apakah anda yakin akan menghapus data Akun ?').then(function(result) {
+                if (result) {
+                    swalConfirm('Semua data yang berkaitan dengan akun anda akan dihapus secara Permanen').then(
+                        function(result) {
+                            if (result) {
+                                deleteData(url, '').then(function(response) {
+                                    swalSuccess(response.message);
+                                    setTimeout(() => {
+                                        window.location.href = '/';
+                                    }, 1000);
+                                }).catch(function(xhr, error) {
+                                    swalError(xhr.responseText);
+                                });
+                            }
+                        });
                 }
             });
         }

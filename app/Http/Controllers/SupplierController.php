@@ -36,7 +36,22 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if($request->ajax()){
+            $data = $request->validate([
+                'name' => 'required|unique:suppliers,name',
+                'telephone' => 'required|unique:suppliers,telephone',
+                'address' => 'required'
+            ]);
+
+            try{
+                Supplier::create($data);
+                return response()->json(['message' => 'Data Supplier baru berhasil Dibuat'], 201);
+            }catch(\Exception $e){
+                return response($e->getMessage(), 500);
+            }
+        }else{
+            abort(400);
+        }
     }
 
     /**
@@ -64,14 +79,25 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
-        //
+        if($request->ajax()){
+            $supplier->update($request->all());
+            return response()->json(['message' => 'Data Supplier berhasil diperbarui'], 200);
+        }else{
+            abort(400);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Supplier $supplier)
+    public function destroy(Supplier $supplier, Request $request)
     {
-        //
+        if($request->ajax()){
+            $sName = $supplier->name;
+            $supplier->delete();
+            return response()->json(['message' => 'Data Supplier '.$sName.' berhasil dihapus'], 200);
+        }else{
+            abort(400);
+        }
     }
 }

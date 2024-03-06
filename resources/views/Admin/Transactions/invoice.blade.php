@@ -2,8 +2,15 @@
 @section('nonauth')
     <div class="py-5 d-flex m-auto" style="width: 95%;">
             <div class="mx-3 container-fluid printable" style="font-size: 15px">
+                <div class="row">
+                    <div class="col-4">
+                        <img src="{{asset('assets/images/Logo/swiftsales-logo.png')}}" class=" ms-auto" width="200" alt="">
+                    </div>
+                    <div class="col-6 d-flex ms-auto">
+                        <h4 class="fw-bold ms-auto">INVOICE</h4>
+                    </div>
+                </div>
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-4 border-bottom header">
-                    <h3 class="fw-bold">INVOICE</h3>
                 </div>
 
                 <div class="d-flex justify-content-between mb-1">
@@ -79,7 +86,7 @@
         });
 
         window.onafterprint = function(event) {
-            window.location.href = '/admin/transactions';
+            window.location.href = '/transactions';
         };
     </script>
     @endpush

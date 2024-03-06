@@ -10,6 +10,9 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\StockHistoryController;
+use App\Http\Controllers\ForgotPasswordController;
+
+
 
 /*
 |-------------------------------------------------------------at-------------
@@ -22,9 +25,17 @@ use App\Http\Controllers\StockHistoryController;
 |
 */
 
+
+Route::get('forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
+Route::post('forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
+Route::get('reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
+Route::post('reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+
+
 Route::get('/', function(){
     return redirect('/login');
 });
+
 
 
 Route::middleware([])->controller(AuthController::class)->group(function(){
@@ -45,38 +56,48 @@ Route::middleware('auth')->group(function(){
         Route::post('/remove/{dirname}','removeImage')->name('removeImage');
     });
 
+    Route::controller(ProductController::class)->group(function(){
+        Route::get('/products/{skip}/get', 'ajaxRequestProduct');
+        Route::get('/products/stock/in', 'stockInView')->name('stockinProduct');
+        Route::get('/products/stock/in/{code}', 'ajaxGetProduct');
+        Route::post('/products/stock/in/store', 'storeNewStock');
+    });
+
+
+    Route::resource('products', ProductController::class);
+
+
+    Route::resource('transactions', TransactionController::class);
+    // Route::get('/transactions/{month}/{year}', [TransactionController::class, 'filterByMonth']);
+
+    Route::get('/transactions/print/{transaction}', [TransactionController::class, 'print']);
+
+
+    Route::prefix('history')->group(function(){
+        Route::get('/stock/in', [StockHistoryController::class, 'index']);
+    });
+
+
+
     Route::middleware('UserPermission:Admin')->prefix('admin')->group(function(){
+        Route::resource('supplier', SupplierController::class);
+
         Route::prefix('customer')->controller(UserController::class)->group(function(){
             Route::get('/list', 'customerLists')->name('customerLists');
             Route::put('/{user}', 'updateCustomer')->name('customerUpdate');
         });
-        Route::post('/upload/description/image', [ProductController::class, 'uploadDescriptionImage']);
+
         Route::controller(DashboardController::class)->group(function(){
             Route::get('/dashboard', 'index');
+            Route::get('/render/chart', 'renderChart');
         });
 
-        Route::controller(ProductController::class)->group(function(){
-            Route::get('/products/{skip}/get', 'ajaxRequestProduct');
-            Route::get('/products/stock/in', 'stockInView')->name('stockinProduct');
-            Route::get('/products/stock/in/{code}', 'ajaxGetProduct');
-            Route::post('/products/stock/in/store', 'storeNewStock');
-        });
-        Route::resource('products', ProductController::class);
 
-        Route::resource('supplier', SupplierController::class);
-
-        Route::resource('transactions', TransactionController::class);
-
-        Route::get('/transactions/print/{transaction}', [TransactionController::class, 'print']);
-
-
-        Route::prefix('history')->group(function(){
-            Route::get('/stock/in', [StockHistoryController::class, 'index']);
-            // Route::get('/transactions', [TransactionController::class, 'history'])->name('transactionsHistory');
-        });
-
-        Route::resource('transactions', TransactionController::class);
     });
+
+    // Route::middleware('UserPermission:Cashier')->prefix('customer')->group(function(){
+
+    // });
 
 });
 

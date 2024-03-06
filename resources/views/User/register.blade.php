@@ -83,7 +83,7 @@
 
                                 <div class="mt-3">
                                     <label for="password">Ulangi Password</label>
-                                    <input type="password" name="password" placeholder="Masukkan Password kembali" id="passwordRepeatInput"
+                                    <input type="password" name="password" placeholder="Masukkan kembali Password" id="passwordRepeatInput"
                                         class="form-control">
                                     <div class="invalid-feedback" id="repeatPassword"></div>
                                 </div>

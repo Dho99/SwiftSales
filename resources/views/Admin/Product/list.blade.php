@@ -52,7 +52,7 @@
                                     <th>Stok</th>
                                     <td id="productSellPrice">{{$product->stock}}</td>
                                 </tr>
-                                <tr>
+                                {{-- <tr>
                                     <th>Harga Jual:</th>
                                     <td id="productSellPrice">@currency($product->sellPrice)</td>
                                 </tr>
@@ -63,7 +63,7 @@
                                 <tr>
                                     <th>Supplier</th>
                                     <td id="productSupplier">{{ $product->supplier->name }}</td>
-                                </tr>
+                                </tr> --}}
                             </table>
                             <div class="row d-flex gap-2">
                                 <div class="col-5">
@@ -165,7 +165,7 @@
                     <div class="col-lg-4 col-md-6 col-sm-10 mx-lg-0 mx-auto mb-3" id="productCardWrapper">
                         <div class="card card bg-light shadow-sm mx-lg-0 mx-md-2" id="productCard">
                             <div id="carouselExampleIndicators${cardIndex}" class="carousel slide" data-bs-ride="carousel">
-                                ${data.images.map((image, indeximage) => `
+                                ${JSON.parse(data.images).map((image, indeximage) => `
                                         <div class="carousel-inner">
                                             <div class="carousel-item${indeximage === 0 ? ' active' : ''}" data-bs-interval="3000">
                                                 <img src="${image}" class="w-100 h-100 img-fluid rounded-top" alt="...">
@@ -196,18 +196,6 @@
                                         <th>Stok</th>
                                         <td id="productBuyPrice">${data.stock}</td>
                                     </tr>
-                                    <tr>
-                                        <th>Harga Jual:</th>
-                                        <td id="productSellPrice">${formatToRupiah(data.sellPrice)}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Kategori</th>
-                                        <td id="productCategory">${data.category}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Supplier</th>
-                                        <td id="productSupplier">${data.supplier}</td>
-                                    </tr>
                                 </table>
                                 <div class="row d-flex gap-2">
                                     <div class="col-lg-3">
@@ -223,7 +211,6 @@
                 `);
             });
         }
-
 
 
         $('#resetFilterButton').on('click', function(){
@@ -287,8 +274,6 @@
         }
 
 
-
-
         $('#filterButton').on('click', function(){
             $('#staticBackdrop').modal('show');
         });
@@ -319,23 +304,23 @@
         function deleteProduct(url, message) {
             swalConfirm("Apakah Anda yakin ingin menghapus?").then(function(result) {
                 if (result) {
-                    deleteData(url, message).then(function(response) {
-                        swalSuccess(response.message);
-                    }).catch(function(xhr, error) {
-                        swalError(xhr.responseText);
-                        console.log(error.message);
-                    });
-                    setTimeout(() => {
-                        findData(currentUrl).then(function(response) {
-                            setTimeout(() => {
-                                refreshCard(response.data);
-                                swalSuccess(response.message)
-                            }, 700);
-                        }).catch(function(xhr, error) {
-                            swalError(xhr.responseText);
-                            console.log(error.message);
-                        });
-                    }, 2000);
+                    // deleteData(url, message).then(function(response) {
+                        // swalSuccess(response.message);
+                        setTimeout(() => {
+                            findData(currentUrl).then(function(response) {
+                                setTimeout(() => {
+                                    refreshCard(response.data);
+                                    swalSuccess(response.message)
+                                }, 700);
+                            }).catch(function(xhr, error) {
+                                swalError(xhr.responseText);
+                                console.log(error.message);
+                            });
+                        }, 2000);
+                    // }).catch(function(xhr, error) {
+                    //     swalError(xhr.responseText);
+                    //     console.log(error.message);
+                    // });
                 }
             }).catch(function(error) {
                 console.log("User cancelled deletion");

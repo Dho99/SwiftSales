@@ -9,6 +9,7 @@
                     <th>Nama Pelanggan</th>
                     <th>Jumlah Pembelian</th>
                     <th>Total</th>
+                    <th>Status</th>
                     <th>Tanggal Transaksi</th>
                     <th>Aksi</th>
                 </tr>
@@ -30,7 +31,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a type="button" class="btn btn-primary">Cetak</a>
+                <div class="ms-auto">
+                    <button type="button" class="btn btn-danger d-none" id="cancelTransaction">Batalkan Transaksi</button>
+                    <a type="button" class="btn btn-primary d-none">Cetak</a>
+                </div>
             </div>
             </div>
         </div>
@@ -41,53 +45,68 @@
     <script>
         const currentUrl = '{{url()->current()}}';
         let trxmodal = $('#transactionDetailModal');
+        const userLevel = '{{auth()->user()->roles}}'
+        const filter = $('#filterHistory');
+        const year = filter.attr('name');
+        const month = filter.val();
+
+        filter.on('change', function(){
+            findDatas();
+        })
+
         $().ready(function(){
             findDatas();
-            // trxmodal.modal('show');
         });
         function findDatas(){
             findData(currentUrl).then(function(response){
+
                 printableWColumns('#transactionHistories', response.transactions, [
-                {
-                    data: null,
-                    render: function(data, type, row, meta){
-                        return meta.row + meta.settings._iDisplayStart + 1;
-                    }
-                },
-                {
-                    data: "code"
-                },
-                {
-                    data: "customer.name"
-                },
-                {
-                    data: null,
-                    render: function(data, type, row){
-                        const quantities = JSON.parse(row.quantity);
-                        return quantities.length + ' Varian';
-                    }
-                },
-                {
-                    data: null,
-                    render: function(data, type, row){
-                        return formatToRupiah(row.subtotal);
-                    }
-                },
-                {
-                    data: null,
-                    render: function(data, type, row){
-                        return formatDate(row.created_at);
-                    }
-                },
-                {
-                    data: null,
-                    render: function(data, type, row){
-                        return `
-                        <button class="badge btn btn-sm btn-primary" onclick="showDetails('${row.id}')"><i class="bi bi-eye"></i></button>
-                        `;
-                    }
-                }
-            ]);
+                    {
+                        data: null,
+                        render: function(data, type, row, meta){
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        }
+                    },
+                    {
+                        data: "code"
+                    },
+                    {
+                        data: "customer.name"
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row){
+                            const quantities = JSON.parse(row.quantity);
+                            return quantities.length + ' Varian';
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row){
+                            return formatToRupiah(row.subtotal);
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row){
+                            return `<div class="badge btn ${row.status == 'Success' ? 'btn-success' : 'btn-danger'}">${row.status}</div>`
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row){
+                            return formatDate(row.created_at);
+                        }
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row){
+                            return `
+                            <button class="badge btn btn-sm btn-primary" onclick="showDetails('${row.id}')"><i class="bi bi-eye"></i></button>
+                            `;
+                        }
+                    },
+                ]);
             }).then(function(xhr, error){
                 swalError(xhr.responseText);
             });
@@ -99,6 +118,7 @@
         function showDetails(id){
             findData(currentUrl+'/'+id).then(function(response){
                 let i = 0;
+                // console.log(userLevel);
                 const data = response.data;
                 trxmodal.modal('show');
                 trxmodal.find('#staticBackdropLabel').text('Detail Transaksi '+data.code);
@@ -114,7 +134,7 @@
                         <h6>Nama Pelanggan : <span class="fw-normal">${data.customer}</span></h6>
                     </div>
                     <div class="col-12">
-                        <h6>Status Transaksi : <span class="fw-normal">${data.status}</span></h6>
+                        <h6>Status Transaksi : <span class="badge btn ${data.status == 'Success' ? 'btn-success' : 'btn-danger'}">${data.status}</span></h6>
                     </div>
                     <div class="col-12">
                         <table class="table table-responsive table-bordered mt-2">
@@ -147,7 +167,15 @@
                     </div>
                 </div>
                 `);
-                trxmodal.find('.modal-footer a').attr('href', `/admin/transactions/print/${id}`);
+                if(data.status === 'Success'){
+                    if(userLevel === 'Admin'){
+                        trxmodal.find('#cancelTransaction').removeClass('d-none').attr('onclick', `deleteTransaction('${id}')`);
+                        trxmodal.find('.modal-footer a').removeClass('d-none').attr('href', `/admin/transactions/print/${id}`);
+                    }
+                }else{
+                    trxmodal.find('#cancelTransaction').addClass('d-none');
+                    trxmodal.find('.modal-footer a').addClass('d-none');
+                }
             });
         }
 
@@ -155,5 +183,22 @@
             trxmodal.find('#staticBackdropLabel').text('');
             trxmodal.find('.modal-body').empty();
         });
+
+        function deleteTransaction(id){
+            swalConfirm('Apakah anda yakin akan membatalkan transaksi ini ?').then(function(result){
+                if(result){
+                    deleteData(currentUrl+`/${id}`, null).then(function(response){
+                        swalSuccess(response.message);
+                        setTimeout(() => {
+                            findDatas();
+                        }, 700);
+                    }).catch(function(xhr){
+                        swalError(xhr.responseText);
+                    })
+                }
+            });
+        }
+
+
     </script>
 @endpush

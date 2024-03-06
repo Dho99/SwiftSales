@@ -4,10 +4,10 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/Select2/css/select2-bootstrap-5-theme.min.css') }}" />
 @endsection
 @section('content')
-    <div class="d-flex flex-row">
-        <div class="col-8">
+    <div class="d-flex row">
+        <div class="col-lg-8 col-md-7 order-lg-1 order-md-1 order-2">
 
-            <div class="col bg-light rounded py-3 mb-2 d-flex justify-content-center shadow-sm me-2">
+            <div class="col bg-light rounded py-3 mb-2 d-flex justify-content-center shadow-sm">
                 <div class="row container">
                     <h5 class="fw-bold text-center mb-2">Cari data Produk</h5>
                     <div class="col-lg-12">
@@ -26,7 +26,7 @@
                 </div>
             </div>
 
-            <div class="col bg-light rounded py-3 d-flex justify-content-center shadow-sm me-2">
+            <div class="col bg-light rounded py-3 mb-2 d-flex justify-content-center shadow-sm">
                 <div class="row container">
                     <h5 class="fw-bold text-center mb-2">Kalkulasi Transaksi</h5>
                     <div class="col-lg-12">
@@ -46,6 +46,22 @@
 
                             </tfoot>
                         </table>
+                        <div class="my-3">
+                            <div class="row">
+                                <div class="col-4">
+                                    <label for="">Terbayar</label>
+                                    <input type="number" class="form-control w-100" id="pay" >
+                                </div>
+                                <div class="col-4 ms-auto">
+                                    <label for="">Jumlah</label>
+                                    <input type="number" class="form-control w-100" readonly id="bill">
+                                </div>
+                                <div class="col-4 ms-auto">
+                                    <label for="">Kembalian</label>
+                                    <input type="number" class="form-control w-100" readonly id="charge">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="row mt-3 mx-0 p-0">
                         <div class="col-lg-3">
@@ -59,7 +75,7 @@
             </div>
         </div>
 
-        <div class="col-4 ">
+        <div class="col-lg-4 col-md-5 order-lg-2 order-md-2 order-1">
             <div class="col bg-light rounded shadow-sm mb-2">
                 <div class="container py-3">
                     <h5 class="fw-bold text-center">Cari data Pelanggan</h5>
@@ -73,12 +89,12 @@
                         </select>
                     </div>
                 </div>
-
             </div>
-            <div class="col bg-light rounded shadow-sm">
+
+            <div class="col bg-light rounded shadow-sm mb-2">
                 <div class="container py-3">
                     <div class="d-flex flex-row mb-3">
-                        <h5 class="fw-bold ms-auto">Checkout Bar</h5>
+                        <h5 class="fw-bold ms-auto">Basket</h5>
                         <button class="btn btn-sm btn-danger ms-auto disabled" id="trashBtn" onclick="emptyCart();"><i
                                 class="bi bi-trash"></i></button>
                     </div>
@@ -94,13 +110,35 @@
     <script>
         $().ready(function() {
             $('#selectCustomer , #selectProduct').select2({
-                theme: 'bootstrap-5'
+                theme: 'bootstrap-5',
+                tags: true
             });
         });
 
+        let productIdArray = [];
+        let quantityArray = [];
+        let total = [];
+        let subtotal = 0;
+
+
+        $('#pay').on('input', function(){
+            let val = parseInt($(this).val());
+            let total = subtotal;
+            let charge = $('#charge');
+
+            chargeVal = val -= total;
+            if(chargeVal < 0){
+                charge.val(0)
+            }else{
+                charge.val(chargeVal);
+            }
+        });
+
+
+
         let transactions = {};
 
-        const productUrl = '/admin/products/';
+        const productUrl = '/products/';
 
         const wrapper = $('#productCheckoutWrapper');
 
@@ -167,8 +205,10 @@
             wrapper.empty();
             coWrapper.empty();
             $('#selectProduct').val('').change();
+            $('#pay').removeClass('is-invalid');
             $('#trxTable tbody, #trxTable tfoot').empty();
             transactions = {};
+            $('#prosesTransaksi').addClass('disabled');
 
         }
 
@@ -178,14 +218,13 @@
             let url = productUrl + id;
             findData(url).then(function(response) {
                 appendToCart(response.data);
+                $('#selectProduct').val('').change();
                 $('#trashBtn, #prosesTransaksi').removeClass('disabled');
                 wrapper.empty();
             }).catch(function(xhr, error) {
                 swalError(xhr.responseText);
             });
         }
-
-
 
         // let idProductArr = [];
 
@@ -266,6 +305,8 @@
                         $(`#productCheckout${id}`).remove();
                         delete transactions[id];
                         addToTable();
+                        $('#prosesTransaksi').addClass('disabled');
+                        reset();
                     }
                 }).catch(function(error) {
                     nVal = 1;
@@ -285,12 +326,9 @@
             coWrapper.empty();
             $('#trashBtn, #prosesTransaksi').addClass('disabled');
             addToTable();
+            reset();
         }
 
-        let productIdArray = [];
-        let quantityArray = [];
-        let total = [];
-        let subtotal = 0;
 
 
         function addToTable() {
@@ -324,7 +362,7 @@
                     <td>${transactions[key].qty}</td>
                     <td>${formatToRupiah(transactions[key].qty * transactions[key].sellPrice)}</td>
                     </tr>
-                    `);
+                `);
             }
 
 
@@ -337,6 +375,7 @@
                 `);
 
             subtotal = grandTotal;
+            $('#bill').val(subtotal);
         }
 
         $('#prosesTransaksi').on('click', function(event) {
@@ -345,8 +384,10 @@
             if(custIdVal.val().length < 1){
                 custIdVal.addClass('is-invalid');
                 swalError('Data Pelanggan tidak boleh kosong');
+            }else if($('#pay').val() < subtotal){
+                $('#pay').addClass('is-invalid');
             }else{
-                const url = '/admin/transactions';
+                const url = '/transactions';
                 let formData = new FormData();
                 formData.append('customerId', custIdVal.val());
                 formData.append('productId', JSON.stringify(productIdArray));
@@ -356,13 +397,16 @@
 
                 storeData(url, formData).then(function(response){
                     swalSuccess(response.message);
-                    swalConfirmWithoutDelete('Apakah anda ingin mencetak Struk / Invoice ?').then(function(result){
-                        if(result){
-                            window.location.href = '/admin/transactions/print/'+response.id;
-                        }
-                    });
-                    reset();
-                    reset();
+                    $('#prosesTransaksi').addClass('disabled');
+                    setTimeout(() => {
+                        swalConfirmWithoutDelete('Apakah anda ingin mencetak Struk / Invoice ?').then(function(result){
+                            if(result){
+                                window.location.href = '/transactions/print/'+response.id;
+                            }
+                        });
+
+                        reset();
+                    }, 1000);
                 }).catch(function(xhr, error){
                     swalError(xhr.responseText);
                 });

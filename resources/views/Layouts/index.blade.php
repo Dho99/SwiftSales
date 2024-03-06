@@ -27,137 +27,205 @@
 </style>
 
 <body class="bg-secondary bg-opacity-25 overflow-hidden">
-    @if(auth()->check())
-    <div class="d-flex w-100" id="parent">
+    @if (auth()->check())
+        <div class="d-flex w-100" id="parent">
 
-        <i class="bi bi-x d-none h3 mb-0 position-absolute bg-sb p-1 z-3 shadow rounded text-light" id="sidebarCollapser"
-            style="left: 170px; top: 20px;" onclick="showHideSidebar()"></i>
-        <div class="w-20 bg-sb d-lg-flex d-none vh-100 shadow-lg overflow-auto" id="sidebar">
-            <div class="d-flex flex-column px-3 py-3">
-                <img src="{{ asset('assets/images/Logo/swiftsales-logo.png') }}" class="img-fluid mt-2 mb-5"
-                alt="">
+            <i class="bi bi-x d-none h3 mb-0 position-absolute bg-sb p-1 z-3 shadow rounded text-light"
+                id="sidebarCollapser" style="left: 170px; top: 20px;" onclick="showHideSidebar()"></i>
+            <div class="w-20 bg-sb d-lg-flex d-none vh-100 shadow-lg overflow-auto" id="sidebar">
+                <div class="d-flex flex-column px-3 py-3">
+                    <img src="{{ asset('assets/images/Logo/swiftsales-logo.png') }}" class="img-fluid mt-2 mb-5"
+                        alt="">
 
-                <div class="mt-5 pb-4">
+                    <div class="mt-5 pb-4">
+                        @if (auth()->user()->roles === 'Admin')
+                            <a href="/admin/dashboard"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Dashboard' ? 'active' : '' }}"><i
+                                    class="bi bi-house me-3"></i> <span class="fs-5">Dashboard</span>
+                            </a>
 
-                    <a href="/admin/dashboard"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Dashboard' ? 'active' : '' }}"><i
-                            class="bi bi-house me-3"></i> <span class="fs-5">Dashboard</span>
-                    </a>
-
-                    <a href="javascript:void(0)" id="sidedropmenu1"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Produk' || $title == 'Stock-in Produk' ? 'active' : '' }}"><i
-                            class="bi bi-box-seam me-3"></i> <span class="fs-5">Produk</span> <i
-                            class="bi bi-chevron-down ms-auto" id="arrow1"></i></i>
-                    </a>
-                    <div id="sidedropcontent1" class="ps-2 d-none">
-                        <a href="/admin/products"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Daftar Produk' ? 'active' : '' }}"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Daftar Produk</span>
-                        </a>
-                        <a href="/admin/products/create"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Tambah Produk' ? 'active' : '' }}"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Tambah Produk</span>
-                        </a>
-                        <a href="/admin/products/stock/in"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in Produk</span>
-                        </a>
-                    </div>
-
-                    <a href="javascript:void(0)" id="sidedropmenu2"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
-                            class="bi bi-clock me-3"></i> <span class="fs-5">Riwayat</span> <i
-                            class="bi bi-chevron-down ms-auto" id="arrow2"></i></i>
-                    </a>
-                    <div id="sidedropcontent2" class="ps-2 d-none">
-                        <a href="/admin/transactions"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi</span>
-                        </a>
-                        <a href="/admin/history/stock/in"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in</span>
-                        </a>
-                    </div>
-
-                    <a href="javascript:void(0)" id="sidedropmenu3"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i class="bi bi-wallet2 me-3"></i>
-                        <span class="fs-5">Transaksi</span> <i
-                            class="bi bi-chevron-down ms-auto" id="arrow3"></i></i>
-                    </a>
-                    <div id="sidedropcontent3" class="ps-2 d-none">
-                        <a href="/admin/transactions/create"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Buat Transaksi</span>
-                        </a>
-                        {{-- <a href="javascript:void(0)"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn"><i
-                                class="bi bi-dash me-3"></i> <span class="fs-5">Tranaksi Dibatalkan</span>
-                        </a> --}}
-                    </div>
-
-                    <a href="/admin/supplier"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
-                            class="bi bi-truck me-3"></i> <span class="fs-5">Supplier</span>
-                    </a>
-
-                    <a href="/user"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
-                            class="bi bi-person me-3"></i> <span class="fs-5">Pengguna</span>
-                    </a>
-
-                    {{-- <a href="{{route('customerLists')}}"
-                        class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn"><i
-                            class="bi bi-journal-medical me-3"></i> <span class="fs-5">Pelanggan</span>
-                    </a> --}}
-                </div>
-            </div>
-        </div>
-
-        <div class="d-flex flex-column w-100">
-            <nav class="navbar navbar-expand bg-body-tertiary shadow-sm">
-                <div class="container">
-                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                        <i class="bi bi-list d-lg-none d-md-block h3 mb-0" onclick="showHideSidebar()"></i>
-                        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <img src="{{ auth()->user()->profilePhoto ? auth()->user()->profilePhoto : asset('assets/images/Avatar/alex-suprun-1RAZcvtAxkk-unsplash.jpg') }}"
-                                        class="img-fluid avatar rounded m-0 p-0" alt="">
+                            <a href="javascript:void(0)" id="sidedropmenu1"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Produk' || $title == 'Tambah Produk' || $title == 'Stock-in Produk' ? 'active' : '' }}"><i
+                                    class="bi bi-box-seam me-3"></i> <span class="fs-5">Produk</span> <i
+                                    class="bi bi-chevron-down ms-auto" id="arrow1"></i></i>
+                            </a>
+                            <div id="sidedropcontent1" class="ps-2 d-none">
+                                <a href="/products"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Daftar Produk' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Daftar Produk</span>
                                 </a>
-                                <ul class="dropdown-menu avatar-dropdown py-0 d-none" id="avatarTop">
-                                    <li><a class="dropdown-item" href="/user/{{auth()->user()->id}}"><i
-                                                class="bi bi-info-circle me-1"></i> Info Akun</a></li>
-                                    <li><a class="dropdown-item btn text-light bg-danger w-100 rounded-0 text-start"
-                                            href="/logout"><i class="bi bi-box-arrow-in-left me-1"></i> Logout</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+                                <a href="/products/create"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Tambah Produk' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Tambah Produk</span>
+                                </a>
+                                <a href="/products/stock/in"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in Produk</span>
+                                </a>
+                            </div>
+
+                            <a href="javascript:void(0)" id="sidedropmenu2"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Riwayat Transaksi' || $title == 'StockIn History' ? 'active' : '' }}"><i
+                                    class="bi bi-clock me-3"></i> <span class="fs-5">Riwayat</span> <i
+                                    class="bi bi-chevron-down ms-auto" id="arrow2"></i></i>
+                            </a>
+                            <div id="sidedropcontent2" class="ps-2 d-none">
+                                <a href="/transactions"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Riwayat Transaksi' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi</span>
+                                </a>
+                                <a href="/history/stock/in"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'StockIn History' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in</span>
+                                </a>
+                            </div>
+
+                            <a href="javascript:void(0)" id="sidedropmenu3"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Create Transactions' ? 'active' : '' }}"><i
+                                    class="bi bi-wallet2 me-3"></i>
+                                <span class="fs-5">Transaksi</span> <i class="bi bi-chevron-down ms-auto"
+                                    id="arrow3"></i></i>
+                            </a>
+                            <div id="sidedropcontent3" class="ps-2 d-none">
+                                <a href="/transactions/create"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Create Transactions' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Buat Transaksi</span>
+                                </a>
+                            </div>
+
+                            <a href="/admin/supplier"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Supplier' ? 'active' : '' }}"><i
+                                    class="bi bi-truck me-3"></i> <span class="fs-5">Supplier</span>
+                            </a>
+
+                            <a href="/user"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Pengguna' ? 'active' : '' }}"><i
+                                    class="bi bi-person me-3"></i> <span class="fs-5">Pengguna</span>
+                            </a>
+
+
+
+                        @elseif(auth()->user()->roles === 'Cashier')
+                        <a href="/transactions/create"
+                            class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Create Transactions' ? 'active' : '' }}"><i
+                                class="bi bi-wallet2 me-3"></i><span class="fs-5">Transaksi</span>
+                        </a>
+
+                        <a href="/products/stock/in"
+                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
+                            class="bi bi-box-seam me-3"></i> <span class="fs-5">Stock-in Produk</span>
+                        </a>
+                            {{-- <a href="javascript:void(0)" id="sidedropmenu1"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Produk' || $title == 'Tambah Produk' || $title == 'Stock-in Produk' ? 'active' : '' }}"><i
+                                    class="bi bi-box-seam me-3"></i> <span class="fs-5">Produk</span> <i
+                                    class="bi bi-chevron-down ms-auto" id="arrow1"></i></i>
+                            </a>
+                            <div id="sidedropcontent1" class="ps-2 d-none">
+                                <a href="/products"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Daftar Produk' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Daftar Produk</span>
+                                </a>
+                                <a href="/products/create"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Tambah Produk' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Tambah Produk</span>
+                                </a>
+                                <a href="/products/stock/in"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in Produk</span>
+                                </a>
+                            </div> --}}
+
+                            <a href="javascript:void(0)" id="sidedropmenu2"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Riwayat Transaksi' || $title == 'StockIn History' ? 'active' : '' }}"><i
+                                    class="bi bi-clock me-3"></i> <span class="fs-5">Riwayat</span> <i
+                                    class="bi bi-chevron-down ms-auto" id="arrow2"></i></i>
+                            </a>
+                            <div id="sidedropcontent2" class="ps-2 d-none">
+                                <a href="/transactions"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Riwayat Transaksi' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Transaksi</span>
+                                </a>
+                                <a href="/history/stock/in"
+                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'StockIn History' ? 'active' : '' }}"><i
+                                        class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in</span>
+                                </a>
+
+                            </div>
+                        @endif
+
+
                     </div>
-
-
                 </div>
-            </nav>
-            <div class="lg-container md-container-fluid h-100 p-3 overflow-auto">
-                <div class="container bg-light rounded py-3 my-2 d-flex shadow-sm">
-                    <h3 class="fw-bold my-auto">{{ $title }}</h3>
-                    @if (Request::is('admin/products', 'admin/customer/list'))
-                        <x-create-data></x-create-data>
-                    @endif
-                    @if(Request::is('admin/history/stock/in'))
-                        <a href="{{route('stockinProduct')}}" class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light"><i class="bi bi-plus-circle me-1"></i> Tambah Data</a>
-                    @endif
-                    @if(Request::is('user'))
-                        <button class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light" onclick="createUser()"><i class="bi bi-plus-circle me-1"></i> Tambah Data</button>
-                    @endif
-                </div>
-                @yield('content')
             </div>
-        </div>
 
-    </div>
+            <div class="d-flex flex-column w-100">
+                <nav class="navbar navbar-expand bg-body-tertiary shadow-sm">
+                    <div class="container">
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                            <i class="bi bi-list d-lg-none d-md-block h3 mb-0" onclick="showHideSidebar()"></i>
+                            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button"
+                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                        <img src="{{ auth()->user()->profilePhoto ? auth()->user()->profilePhoto : asset('assets/images/Avatar/alex-suprun-1RAZcvtAxkk-unsplash.jpg') }}"
+                                            class="img-fluid avatar rounded m-0 p-0" alt="">
+                                    </a>
+                                    <ul class="dropdown-menu avatar-dropdown py-0 d-none" id="avatarTop">
+                                        <li><a class="dropdown-item" href="/user/{{ auth()->user()->id }}"><i
+                                                    class="bi bi-info-circle me-1"></i> Info Akun</a></li>
+                                        <li><a class="dropdown-item btn text-light bg-danger w-100 rounded-0 text-start"
+                                                href="/logout"><i class="bi bi-box-arrow-in-left me-1"></i> Logout</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+
+
+                    </div>
+                </nav>
+                <div class="lg-container md-container-fluid h-100 p-3 overflow-auto">
+                    <div class="container bg-light rounded py-3 my-2 d-flex shadow-sm">
+                        <h3 class="fw-bold my-auto">{{ $title }}</h3>
+                        @if (Request::is('admin/products', 'admin/customer/list'))
+                            <x-create-data></x-create-data>
+                        @endif
+                        @if (Request::is('admin/history/stock/in'))
+                            <a href="{{ route('stockinProduct') }}"
+                                class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light"><i
+                                    class="bi bi-plus-circle me-1"></i> Tambah Data
+                            </a>
+                        @endif
+                        @if (Request::is('user', 'admin/supplier'))
+                            <button
+                                class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light"
+                                onclick="createUser()"><i class="bi bi-plus-circle me-1"></i> Tambah Data
+                            </button>
+                        @endif
+                        {{-- @if(Request::is('transactions'))
+                            @php
+                                $year = \Illuminate\Support\Carbon::now()->format('Y');
+                                $months = [];
+                                $monthNumbers = [];
+                                $monthRange = range(1,12);
+                                foreach($monthRange as $month){
+                                    $date = \Illuminate\Support\Carbon::createFromDate($year, $month, 1);
+                                    $months[] = $date->format('F');
+                                    $monthNumbers[] = $date->format('m');
+                                }
+                            @endphp
+                            <select name="{{$year}}" class="form-control form-control-sm w-25 d-flex ms-auto" id="filterHistory">
+                                @foreach ($months as $key => $item)
+                                    <option value="{{$monthNumbers[$key]}}" {{$monthNumbers[$key] == now()->format('m') ? 'selected' : ''}}>{{$item}}</option>
+                                @endforeach
+                            </select>
+                        @endif --}}
+                    </div>
+                    @yield('content')
+                </div>
+            </div>
+
+        </div>
     @else
         @yield('nonauth')
     @endif
@@ -184,6 +252,10 @@
         $('a#sidedropmenu3').on('click', function() {
             $('#sidedropcontent3').toggleClass('d-none');
             $('#arrow3').toggleClass('rotateArrow');
+        });
+        $('a#sidedropmenu4').on('click', function() {
+            $('#sidedropcontent4').toggleClass('d-none');
+            $('#arrow4').toggleClass('rotateArrow');
         });
 
         function showHideSidebar() {
@@ -264,7 +336,7 @@
                     error: function(xhr, error) {
                         reject(xhr, error);
                     }
-                }).done(function(){
+                }).done(function() {
                     Swal.close();
                 });
             });
@@ -324,7 +396,7 @@
             });
         }
 
-        function printableWColumns(id, data,columns) {
+        function printableWColumns(id, data, columns) {
             let table = new DataTable(id, {
                 responsive: true,
                 searching: true,
@@ -356,17 +428,10 @@
             return "Rp. " + number.toLocaleString('id-ID');
         }
 
-        function formatDate(date){
+        function formatDate(date) {
             let myDate = new Date(date).toLocaleString();
             return myDate;
         }
-
-        // function closeModal(modalId){
-        //     $(modalId).on('hidden.bs.modal', function(){
-        //         resetModal();
-        //         // console.log('modal-closed'+modalId);
-        //     });
-        // }
     </script>
 </body>
 

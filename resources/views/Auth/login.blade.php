@@ -57,6 +57,11 @@
                                     <label for="password">Password</label>
                                     <input type="password" name="password" placeholder="Masukkan Password" id="password" class="form-control">
                                 </div>
+                                @if(session()->has('loginError'))
+                                    <div class="mt-3 w-100 text-center">
+                                        <a href="{{route('forget.password.get')}}" class="">Lupa Password ?</a>
+                                    </div>
+                                @endif
                                 <div class="row d-inline mx-auto">
                                     <p class="mt-4 mb-3 text-center">Belum punya akun ? <a href="{{route('register')}}">Daftar Sekarang</a></p>
                                     <button type="submit" class="btn btn-primary mb-0">Login</button>

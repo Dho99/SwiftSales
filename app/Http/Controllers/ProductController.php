@@ -88,7 +88,7 @@ class ProductController extends Controller
 
     public function stockInView(){
         return view('Admin.Product.stock-in', [
-            'title' => 'Stock In Produk',
+            'title' => 'Stock-in Produk',
             'recomendations' => Product::where('stock', '<=', 10)->get(),
         ]);
     }

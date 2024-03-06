@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -36,7 +37,7 @@ class UserController extends Controller
             return response()->json(['users' => $users], 200);
         }else{
             return view('Admin.Users.lists',[
-                'title' => 'Daftar Pelanggan',
+                'title' => 'Daftar Pengguna',
             ]);
         }
     }
@@ -91,9 +92,12 @@ class UserController extends Controller
             'profilePhoto' => 'required',
             'name' => 'required',
             'telephone' => 'required',
+            'password' => 'required'
         ]);
 
-        if (auth()->user()->email !== $data['email'] || auth()->user()->roles === 'Admin') {
+        $data['password'] = Hash::make($data['password']);
+
+        if (auth()->user()->email !== $data['email'] || auth()->user()->roles !== 'Admin') {
             return response('Tindakan illegal', 403);
         } else {
             try{
