@@ -32,12 +32,18 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $users = User::whereNot('id', auth()->user()->id)->get();
+        if(auth()->user()->roles === 'Admin'){
+            $users = User::whereNot('id', auth()->user()->id)->get();
+            $title = 'Daftar Pengguna';
+        }else{
+            $users = User::whereNot('id', auth()->user()->id)->where('roles', 'Customer')->get();
+            $title = 'Daftar Customer';
+        }
         if($request->ajax()){
             return response()->json(['users' => $users], 200);
         }else{
             return view('Admin.Users.lists',[
-                'title' => 'Daftar Pengguna',
+                'title' => $title,
             ]);
         }
     }
@@ -92,21 +98,21 @@ class UserController extends Controller
             'profilePhoto' => 'required',
             'name' => 'required',
             'telephone' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         $data['password'] = Hash::make($data['password']);
 
-        if (auth()->user()->email !== $data['email'] || auth()->user()->roles !== 'Admin') {
-            return response('Tindakan illegal', 403);
-        } else {
+        // if (auth()->user()->email !== $data['email'] || auth()->user()->roles !== 'Admin') {
+        //     return response('Tindakan illegal', 403);
+        // } else {
             try{
                 User::where('email', $request->email)->update($data);
                 return response()->json(['message' => 'Data Akun berhasil diperbarui']);
             }catch(\Exception $e){
                 return response($e->getMessage(), 400);
             }
-        }
+        // }
     }
 
 
@@ -168,7 +174,7 @@ class UserController extends Controller
             'telephone' => 'required|unique:users',
             'password' => 'required',
             'roles' => 'required',
-            'code' => 'required'
+            'code' => 'required',
         ]);
 
         if($validator->fails()){
@@ -177,11 +183,11 @@ class UserController extends Controller
 
         $validated = $validator->validated();
         $validated['profilePhoto'] = '';
-
+        $validated['address'] = $request->address;
         try{
-            User::create($validated);
+            $user = User::create($validated);
             if($request->ajax()){
-                return response()->json(['message' => 'Data berhasil Ditambahkan'], 201);
+                return response()->json(['message' => 'Data berhasil Ditambahkan', 'data' => $user], 201);
             }else{
                 return back()->with('success', 'Data anda berhasil Terdaftar, silakan Login');
             }

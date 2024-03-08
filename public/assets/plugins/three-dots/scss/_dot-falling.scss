@@ -1,0 +1,107 @@
+/**
+ * ==============================================
+ * Dot Falling
+ * ==============================================
+ */
+
+@use './variables';
+@use './mixins';
+
+$left-pos: -9999px;
+$x1: - $left-pos - variables.$dot-spacing;
+$x2: - $left-pos;
+$x3: - $left-pos + variables.$dot-spacing;
+
+$y1: - variables.$dot-spacing;
+$y2: 0;
+$y3: variables.$dot-spacing;
+
+$color-0: rgba(variables.$dot-color, 0);
+$color-1: rgba(variables.$dot-color, 1);
+
+$color-before-0: rgba(variables.$dot-before-color, 0);
+$color-before-1: rgba(variables.$dot-before-color, 1);
+
+$color-after-0: rgba(variables.$dot-after-color, 0);
+$color-after-1: rgba(variables.$dot-after-color, 1);
+
+.dot-falling {
+  position: relative;
+  left: $left-pos;
+
+  @include mixins.dot;
+
+  box-shadow: $x2 0 0 0 variables.$dot-color;
+  animation: dot-falling 1s infinite linear;
+  animation-delay: .1s;
+
+  &::before,
+  &::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+  }
+
+  &::before {
+    @include mixins.dot($bg-color: variables.$dot-before-color);
+
+    animation: dot-falling-before 1s infinite linear;
+    animation-delay: 0s;
+  }
+
+  &::after {
+    @include mixins.dot($bg-color: variables.$dot-after-color);
+
+    animation: dot-falling-after 1s infinite linear;
+    animation-delay: .2s;
+  }
+}
+
+@keyframes dot-falling {
+  0% {
+    box-shadow: $x2 $y1 0 0 $color-0;
+  }
+
+  25%,
+  50%,
+  75% {
+    box-shadow: $x2 $y2 0 0 $color-1;
+  }
+
+  100% {
+    box-shadow: $x2 $y3 0 0 $color-0;
+  }
+}
+
+@keyframes dot-falling-before {
+  0% {
+    box-shadow: $x1 $y1 0 0 $color-before-0;
+  }
+
+  25%,
+  50%,
+  75% {
+    box-shadow: $x1 $y2 0 0 $color-before-1;
+  }
+
+  100% {
+    box-shadow: $x1 $y3 0 0 $color-before-0;
+  }
+}
+
+@keyframes dot-falling-after {
+  0% {
+    box-shadow: $x3 $y1 0 0 $color-after-0;
+  }
+
+  25%,
+  50%,
+  75% {
+    box-shadow: $x3 $y2 0 0 $color-after-1;
+  }
+
+  100% {
+    box-shadow: $x3 $y3 0 0 $color-after-0;
+  }
+}

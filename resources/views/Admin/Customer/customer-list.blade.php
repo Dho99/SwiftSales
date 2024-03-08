@@ -126,6 +126,10 @@
                     <input type="text" class="form-control" id="name" readonly value="${data.telephone}">
                 </div>
                 <div class="col-12 form-group">
+                    <label for="name">Alamat</label>
+                    <input type="text" class="form-control" id="name" readonly value="${data.address}">
+                </div>
+                <div class="col-12 form-group">
                     <label for="name">Bergabung Pada</label>
                     <input type="text" class="form-control" id="name" readonly value="${formatDate(data.created_at)}">
                 </div>

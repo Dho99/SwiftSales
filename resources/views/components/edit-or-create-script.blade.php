@@ -17,27 +17,30 @@
         this.on("success", function(file, response) {
             // Memasukkan nama file yang diunggah ke dalam array uploadedFile
             uploadedFile.push('/storage/uploads/productImage/' + response.file);
-
+             console.log(response.file);
             // Membuat tombol hapus
             var removeButton = Dropzone.createElement(
                 "<button class='btn btn-danger' type='button'>Hapus</button>");
 
-            // Menambahkan event listener untuk tombol hapus
-            removeButton.addEventListener("click", function() {
-                // Mengirim permintaan ke server untuk menghapus file secara permanen
+                // Menambahkan event listener untuk tombol hapus
+                removeButton.addEventListener("click", function() {
+                const formData = new FormData();
+                 uploadedFile.filter(file => {
+                    formData.append('filename', file);
+                });
                 $.ajax({
-                    url: '/image/remove/productImage',
+                    url: '/image/remove',
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     },
-                    data: {
-                        filename: file.name
-                    },
+                    data: formData,
+                    contentType: false,
+                    processData: false,
                     success: function(response) {
                         // Hapus file dari tampilan Dropzone hanya jika berhasil dihapus dari server
                         myDropzone.removeFile(file);
-                        removeFromArray(response.data);
+                        removeFromArray(response.file);
                     },
                     error: function(xhr, status, error) {
                         swalErrror(xhr.responseText)

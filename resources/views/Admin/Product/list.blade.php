@@ -106,10 +106,9 @@
             <div class="form-group">
                 <label for="category">Filter Produk Berdasarkan</label>
                 <select name="" id="filterByCategory" class="form-select mt-1" onchange="getResult()">
-                    <option value="">Semua</option>
+                    <option value="">Pilih opsi Filtering</option>
                     <option value="productName">Nama</option>
-                    <option value="productCategory">Kategori</option>
-                    <option value="productSupplier">Supplier</option>
+                    <option value="productCode">Kode Produk</option>
                 </select>
             </div>
             <div class="form-group" id="selectResult">
@@ -133,34 +132,48 @@
         const wrapper = $('.card');
         let cardIndex = wrapper.length;
 
-        $().ready(function(){
-            getResult();
-        });
+        // $().ready(function(){
+        //     getResult();
+        // });
 
-        let scrollValue = $(document).height();
-        $('div').scroll(function() {
-            if(wrapper.length < 6){
-                scrollValue += 300;
-            }
-            if ($(this).scrollTop() >= scrollValue) {
-                console.log(scrollValue);
-                if($(document).width() <= 800){
-                    scrollValue+=(scrollValue * 3);
-                }else{
-                    scrollValue+=scrollValue;
-                }
-                findData(currentUrl+'/'+cardIndex+'/get').then(function(response) {
-                    appendCard(response.data);
-                }).catch(function(xhr, error) {
-                    swalError(xhr.responseText);
-                    console.log(error.message);
-                });
-            }
-        });
+        // let scrollValue = $(document).height();
+        // scrollValue -= 200;
+
+        // $('div').scroll(function() {
+        //     const wrapper = $('#cardProductWrapper');
+        //     if (wrapper.children().length < 6) {
+        //         scrollValue += 300;
+        //     }
+        //     if ($(this).scrollTop() >= scrollValue) {
+        //         if ($(document).width() <= 768) {
+        //             scrollValue += (scrollValue * 3);
+        //         } else {
+        //             scrollValue += scrollValue;
+        //         }
+
+        //         findData(currentUrl)
+        //             .then(function(response) {
+        //                 appendCard(response.data);
+        //             })
+        //             .catch(function(xhr) {
+        //                 swalError(xhr.responseText);
+        //             });
+        //     }
+        // });
+
+        function findDatas(){
+            findData(currentUrl).then(function(response) {
+                appendCard(response.data);
+            }).catch(function(xhr) {
+                swalError(xhr.responseText);
+            });
+        }
 
         function appendCard(datas){
+            $('#cardProductWrapper').empty();
             datas.map((data, index) => {
                 cardIndex+=1;
+                // console.log(data);
                 $('#cardProductWrapper').append(`
                     <div class="col-lg-4 col-md-6 col-sm-10 mx-lg-0 mx-auto mb-3" id="productCardWrapper">
                         <div class="card card bg-light shadow-sm mx-lg-0 mx-md-2" id="productCard">
@@ -225,23 +238,15 @@
             $('#selectResult input').val('');
             filterFormWrapper.empty();
             if(selectedFilterMethod !== ''){
-                if(selectedFilterMethod === 'productCategory'){
-                    filterFormWrapper.append(`
-                        <input type="text" name="" id="category" class="form-control" placeholder="Masukkan Keywords">
-                    `);
-                }else if(selectedFilterMethod === 'productName'){
+                if(selectedFilterMethod === 'productName'){
                     filterFormWrapper.append(`
                         <input type="text" name="" id="name" class="form-control" placeholder="Masukkan Keywords">
                     `);
-                }else if(selectedFilterMethod === 'productSupplier'){
+                }else if(selectedFilterMethod === 'productCode'){
                     filterFormWrapper.append(`
                         <input type="text" name="" id="supplier" class="form-control" placeholder="Masukkan Keywords">
                     `);
                 }
-            }else{
-                filterFormWrapper.append(`
-                    <input type="text" name="" id="allType" class="form-control" placeholder="Masukkan Keywords">
-                `);
             }
         }
 
@@ -280,47 +285,43 @@
 
 
 
-        function refreshCard(data) {
-            // console.log(data.length);
-            const atEmpty = $('#atEmptyData');
-            wrapper.empty();
-            if (data.length < 1) {
-                atEmpty.append(`
-                <div
-                    class="container-fluid bg-light py-3 mx-auto rounded text-center fw-bold d-flex flex-column text-info-emphasis">
-                    <i class="bi bi-dropbox h1"></i>
-                    Tidak ada data produk
-                </div>
-                `);
-            } else {
-                Swal.close();
-                $('#cardProductWrapper').empty();
-                appendCard(data);
-
-            };
-        }
+        // function refreshCard(data) {
+        //     const atEmpty = $('#atEmptyData');
+        //     const wrapper = $('#cardProductWrapper');
+        //     wrapper.empty();
+        //     if (data.length < 1) {
+        //         atEmpty.html(`
+        //             <div class="container-fluid bg-light py-3 mx-auto rounded text-center fw-bold d-flex flex-column text-info-emphasis">
+        //                 <i class="bi bi-dropbox h1"></i>
+        //                 Tidak ada data produk
+        //             </div>
+        //         `);
+        //     } else {
+        //         Swal.close();
+        //         appendCard(data);
+        //     }
+        //     $('div').scrollTop(0);
+        //     findDatas();
+        //     scrollValue = $(document).height();
+        //     scrollValue -= 200;
+        //     console.log(scrollValue);
+        // }
 
 
         function deleteProduct(url, message) {
             swalConfirm("Apakah Anda yakin ingin menghapus?").then(function(result) {
                 if (result) {
-                    // deleteData(url, message).then(function(response) {
-                        // swalSuccess(response.message);
-                        setTimeout(() => {
-                            findData(currentUrl).then(function(response) {
-                                setTimeout(() => {
-                                    refreshCard(response.data);
-                                    swalSuccess(response.message)
-                                }, 700);
-                            }).catch(function(xhr, error) {
-                                swalError(xhr.responseText);
-                                console.log(error.message);
-                            });
-                        }, 2000);
-                    // }).catch(function(xhr, error) {
-                    //     swalError(xhr.responseText);
-                    //     console.log(error.message);
-                    // });
+                    deleteData(url, message)
+                        .then(function(response) {
+                            swalSuccess(response.message);
+                            setTimeout(() => {
+                                findDatas(currentUrl)
+                            }, 1000);
+                        })
+                        .catch(function(xhr, error) {
+                            swalError(xhr.responseText);
+                            console.log(error.message);
+                        });
                 }
             }).catch(function(error) {
                 console.log("User cancelled deletion");

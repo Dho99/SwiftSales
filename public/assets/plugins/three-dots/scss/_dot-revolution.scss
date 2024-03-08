@@ -1,0 +1,51 @@
+/**
+ * ==============================================
+ * Dot Revolution
+ * ==============================================
+ */
+
+@use './variables';
+@use './mixins';
+
+.dot-revolution {
+  position: relative;
+
+  @include mixins.dot;
+
+  &::before,
+  &::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+  }
+
+  &::before {
+    left: 0;
+    top: - variables.$dot-spacing;
+
+    @include mixins.dot($bg-color: variables.$dot-before-color);
+
+    transform-origin: (variables.$dot-width * .5) (variables.$dot-spacing + variables.$dot-width * .5);
+    animation: dot-revolution 1.4s linear infinite;
+  }
+
+  &::after {
+    left: 0;
+    top: - variables.$dot-spacing * 2;
+
+    @include mixins.dot($bg-color: variables.$dot-after-color);
+
+    transform-origin: (variables.$dot-width * .5) (variables.$dot-spacing * 2 + variables.$dot-width * .5);
+    animation: dot-revolution 1s linear infinite;
+  }
+}
+
+@keyframes dot-revolution {
+  0% {
+    transform: rotateZ(0deg) translate3d(0, 0, 0);
+  }
+
+  100% {
+    transform: rotateZ(360deg) translate3d(0, 0, 0);
+  }
+}

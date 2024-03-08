@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('profilePhoto');
             $table->enum('roles', ['Admin', 'Cashier', 'Customer']);
             $table->string('email')->unique();
+            $table->text('address');
             $table->string('password');
             $table->timestamps();
         });

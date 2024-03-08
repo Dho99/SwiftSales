@@ -1,0 +1,59 @@
+/**
+ * ==============================================
+ * Dot Collision
+ * ==============================================
+ */
+
+.dot-collision {
+  .dot;
+
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 0;
+  }
+
+  &::before {
+    .dot(@bg-color: @dot-before-color);
+
+    left: - @dot-width;
+    animation: dot-collision-before 2s infinite ease-in;
+  }
+
+  &::after {
+    .dot(@bg-color: @dot-after-color);
+
+    left: @dot-width;
+    animation: dot-collision-after 2s 1s infinite ease-in;
+  }
+}
+
+@keyframes dot-collision-before {
+  0%,
+  50%,
+  75%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(-@dot-spacing);
+  }
+}
+
+@keyframes dot-collision-after {
+  0%,
+  50%,
+  75%,
+  100% {
+    transform: translateX(0);
+  }
+
+  25% {
+    transform: translateX(@dot-spacing);
+  }
+}

@@ -17,7 +17,7 @@ class DashboardController extends Controller
 
         return view('Admin.dashboard', [
             'title' => 'Dashboard',
-            'subtotalTransactionsAMonth' => Transaction::whereMonth('created_at', Carbon::today())->sum('subtotal'),
+            'subtotalTransactionsAMonth' => Transaction::whereMonth('created_at', Carbon::now()->format('m'))->sum('subtotal'),
             'subtotalTransactionsADay' => Transaction::whereDate('created_at', Carbon::today())->sum('subtotal'),
             'countTransactions' => $transactions->count(),
             'customers' => User::where('roles', 'Customer')->get(),

@@ -46,10 +46,10 @@
             </div>
             <div id="passwordEdit" class="row m-0 p-0 w-100"></div>
             <div class="col-lg-12 row m-0 p-0">
-                <div class="col-lg-3 col-md-6 col-12 order-lg-1 order-md-1 order-2">
+                {{-- <div class="col-lg-3 col-md-6 col-12 order-lg-1 order-md-1 order-2">
                     <button class="btn btn-danger w-100 my-1" onclick="deleteAccount('{{ $user->id }}')"
                         data-id="{{ $user->id }}">Hapus Akun</button>
-                </div>
+                </div> --}}
                 <div class="col-lg-3 col-md-6 col-12 ms-auto order-lg-2 order-md-2 order-1">
                     <button class="btn btn-primary w-100 my-1" onclick="changeToEdit()" id="editBtn">Edit Akun</button>
                 </div>
@@ -65,8 +65,6 @@
         function editProfilePhoto() {
             $('#profilePhotoInput').click();
         }
-
-
 
         let passVal;
 

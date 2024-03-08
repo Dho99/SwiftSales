@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="{{ asset('assets/plugins/Sweetalert/dist/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/plugins/Sweetalert/dist/sweetalert2.all.min.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/plugins/DataTables/css/datatables.min.css') }}">
+    <link rel="stylesheet" href="{{asset('assets/plugins/three-dots/dist/three-dots.min.css')}}">
     @yield('plugins')
 </head>
 <style>
@@ -27,6 +28,8 @@
 </style>
 
 <body class="bg-secondary bg-opacity-25 overflow-hidden">
+
+
     @if (auth()->check())
         <div class="d-flex w-100" id="parent">
 
@@ -115,6 +118,8 @@
                             class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
                             class="bi bi-box-seam me-3"></i> <span class="fs-5">Stock-in Produk</span>
                         </a>
+
+
                             {{-- <a href="javascript:void(0)" id="sidedropmenu1"
                                 class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Produk' || $title == 'Tambah Produk' || $title == 'Stock-in Produk' ? 'active' : '' }}"><i
                                     class="bi bi-box-seam me-3"></i> <span class="fs-5">Produk</span> <i
@@ -151,6 +156,10 @@
                                 </a>
 
                             </div>
+
+                            <a href="/user"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Customer' ? 'active' : '' }}"><i class="bi bi-people-fill me-3"></i><span class="fs-5">Customer</span>
+                            </a>
                         @endif
 
 
@@ -184,19 +193,20 @@
 
                     </div>
                 </nav>
-                <div class="lg-container md-container-fluid h-100 p-3 overflow-auto">
+                <div class="lg-container md-container-fluid h-100 p-3 overflow-auto position-relative">
                     <div class="container bg-light rounded py-3 my-2 d-flex shadow-sm">
                         <h3 class="fw-bold my-auto">{{ $title }}</h3>
-                        @if (Request::is('admin/products', 'admin/customer/list'))
+
+                        @if (Request::is('products', 'admin/customer/list'))
                             <x-create-data></x-create-data>
                         @endif
-                        @if (Request::is('admin/history/stock/in'))
+                        @if (Request::is('history/stock/in'))
                             <a href="{{ route('stockinProduct') }}"
                                 class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light"><i
                                     class="bi bi-plus-circle me-1"></i> Tambah Data
                             </a>
                         @endif
-                        @if (Request::is('user', 'admin/supplier'))
+                        @if (Request::is('user', 'supplier'))
                             <button
                                 class="btn btn bg-primary bg-opacity-75 d-inline-flex align-items-center ms-auto text-light"
                                 onclick="createUser()"><i class="bi bi-plus-circle me-1"></i> Tambah Data
@@ -221,7 +231,11 @@
                             </select>
                         @endif --}}
                     </div>
+                    <div class="container my-3 py-3 bg-light w-25 position-absolute top-50 start-50 translate-middle rounded d-none" id="loader">
+                        <div class="dot-elastic  d-flex mx-auto"></div>
+                    </div>
                     @yield('content')
+
                 </div>
             </div>
 
@@ -231,6 +245,7 @@
     @endif
 
 
+
     <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.js') }}"></script>
     <script src="{{ asset('assets/plugins/DataTables/js/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/jquery/jquery-3.7.1.min.js') }}"></script>
@@ -238,6 +253,7 @@
 
     @stack('scripts')
     <script>
+        const loader = $('#loader');
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
 
@@ -305,9 +321,8 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    beforeSend: function() {
-                        swalBeforeSend();
-                    },
+                    // beforeSend: function() {
+                    // },
                     success: function(response) {
                         resolve(response);
                     },
@@ -328,16 +343,17 @@
                     method: 'GET',
                     cache: false,
                     beforeSend: function() {
-                        swalBeforeSend();
+                        loader.removeClass('d-none');
                     },
                     success: function(response) {
                         resolve(response);
                     },
                     error: function(xhr, error) {
-                        reject(xhr, error);
+                        reject(xhr);
                     }
                 }).done(function() {
                     Swal.close();
+                    loader.addClass('d-none');
                 });
             });
         }

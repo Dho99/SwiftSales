@@ -27,7 +27,7 @@ class DropzoneController extends Controller
         $filename = $file->getClientOriginalName();
         $store = $file->move($directory, $filename);
         $resizeImage = new ImageResize($directory.'/'.$filename);
-        $resizeImage->resizeToBestFit(500, 300);
+        $resizeImage->crop(500, 300);
         Storage::delete('public/uploads/'.$dirname.'/'.$filename);
         $filename = 'resized'.time().'-'.$filename;
         $upload_success = $resizeImage->save($directory.'/'.$filename);
@@ -39,14 +39,14 @@ class DropzoneController extends Controller
         }
     }
 
-    public function removeImage(Request $request, $dirname){
+    public function removeImage(Request $request){
         $data = $request->all();
 
         $filename = $data['filename'];
 
-        $delete = Storage::delete('public/uploads/'.$dirname.'/'.$filename);
+        $delete = Storage::delete(str_replace('/storage','public',$filename));
 
-        return response()->json(['file' => $data], 200);
+        return response()->json(['file' => $delete], 200);
     }
 
 }

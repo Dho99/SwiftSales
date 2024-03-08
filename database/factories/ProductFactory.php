@@ -23,7 +23,7 @@ class ProductFactory extends Factory
             'description' => fake()->paragraph(),
             'supplierId' => fake()->numberBetween(1,10),
             'categoryId' => fake()->numberBetween(1,10),
-            'images' => json_encode(fake()->imageUrl(640, 480, 'animals', true)),
+            'images' => json_encode(array(fake()->imageUrl(640, 480, 'animals', true))),
             'stock' => fake()->numberBetween(0, 100),
             'buyPrice' => fake()->randomNumber(5, true),
             'sellPrice' => fake()->randomNumber(5, true),

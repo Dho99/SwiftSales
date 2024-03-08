@@ -16,7 +16,7 @@
                             <select name="" id="selectProduct" class="form-select" style="width: 100%;">
                                 <option value=""></option>
                                 @foreach ($products as $product)
-                                    <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                    <option value="{{ $product->id }}">{{$product->code}} | {{ $product->name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -88,6 +88,9 @@
                             @endforeach
                         </select>
                     </div>
+                    <div>
+                        Tidak ditemukan Pelanggan?<br> <a href="#" onclick="createCustomer()">Tambah Sekarang</a>
+                    </div>
                 </div>
             </div>
 
@@ -104,16 +107,120 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="createUserModal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Buat Data Pengguna</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group" id="registerInput">
+                    <div class="mt-3">
+                        <label for="username">Nama</label>
+                        <input type="text" name="name" placeholder="Nama Lengkap" id="name"
+                            value=""
+                            class="form-control">
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="telephone">No. Telephone</label>
+                        <input type="text" name="telephone" placeholder="Nomor Telephone" id="telephone"
+                            value=""
+                            class="form-control">
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="username">Email</label>
+                        <input type="email" name="email" placeholder="Email Aktif" id="email"
+                            value=""
+                            class="form-control">
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="username">Address</label>
+                        <input type="email" name="email" placeholder="Alamat" id="address"
+                            value=""
+                            class="form-control">
+                    </div>
+
+                    <div class="mt-3">
+                        <label for="password">Password</label>
+                        <input type="password" name="password" placeholder="Masukkan Password" id="password"
+                            class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="storeUserBtn">Simpan</button>
+            </div>
+            </div>
+        </div>
+     </div>
+
+
 @endsection
 @push('scripts')
+    <script src="{{ asset('assets/plugins/inputmask/js/jquery.mask.min.js') }}"></script>
     <script src="{{ asset('assets/plugins/Select2/js/select2.min.js') }}"></script>
     <script>
-        $().ready(function() {
+           $().ready(function() {
             $('#selectCustomer , #selectProduct').select2({
                 theme: 'bootstrap-5',
-                tags: true
+                // tags: true
             });
+
         });
+
+        $('#createUserModal').on('hidden.bs.modal', function() {
+            $(this).find('#registerInput input').val('');
+        });
+
+        function addToOptions(data){
+            $('#createUserModal').modal('hide');
+            $('#selectCustomer').append(`
+                <option value="${data.id}">${data.name}</option>
+            `);
+        }
+
+        $('#storeUserBtn').on('click', function(){
+            const name = $('input#name');
+            const telephone = $('input#telephone');
+            const email = $('input#email');
+            const password = $('input#password');
+            const address = $('input#address');
+
+            if(name.val().length < 8 && telephone.val().length < 8 && email.val().length < 8 && password.val().length < 8){
+                swalError('Harap Masukkan semua data dengan benar dan teliti');
+            }else{
+                const currUrl = '/register';
+                const formData = new FormData();
+                formData.append('name', name.val());
+                formData.append('telephone', telephone.val());
+                formData.append('email', email.val());
+                formData.append('password', password.val());
+                formData.append('address', password.val());
+
+                storeData(currUrl, formData).then(function(response){
+                    swalSuccess(response.message);
+                    addToOptions(response.data);
+                }).catch(function(xhr, error){
+                    swalError(xhr.responseText);
+                });
+            }
+        });
+
+
+
+
+
+
+        function createCustomer(){
+            $('#createUserModal').modal('show');
+        }
 
         let productIdArray = [];
         let quantityArray = [];
@@ -145,7 +252,6 @@
         $('#selectProduct').on('change', function() {
             let val = $(this).val();
             let url = productUrl + val;
-            // console.log(val);
             if (val) {
                 wrapper.empty();
                 findData(url).then(function(response) {
@@ -185,9 +291,6 @@
                                     </table>
                                 </div>
                                 <div class="card-text row d-flex mx-auto">
-                                    <div class="col-lg-5 col-md-5 col-6">
-                                        <button class="btn btn-danger w-100"><i class="bi bi-trash3 me-2"></i>Hapus</button>
-                                    </div>
                                     <div class="col-lg-6 col-md-6 col-6 ms-auto">
                                         <button class="btn btn-primary w-100" onclick="addToCart('${data.id}')"><i class="bi bi-cart-plus me-2"></i>Tambah</button>
                                     </div>

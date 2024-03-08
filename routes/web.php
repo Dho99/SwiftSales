@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function(){
 
     Route::prefix('image')->controller(DropzoneController::class)->group(function(){
         Route::post('/upload/{dirname}','uploadImage')->name('uploadImage');
-        Route::post('/remove/{dirname}','removeImage')->name('removeImage');
+        Route::post('/remove','removeImage')->name('removeImage');
     });
 
     Route::controller(ProductController::class)->group(function(){
@@ -68,7 +68,6 @@ Route::middleware('auth')->group(function(){
 
 
     Route::resource('transactions', TransactionController::class);
-    // Route::get('/transactions/{month}/{year}', [TransactionController::class, 'filterByMonth']);
 
     Route::get('/transactions/print/{transaction}', [TransactionController::class, 'print']);
 

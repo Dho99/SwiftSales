@@ -1,10 +1,19 @@
 @extends('Layouts.index')
+@section('plugins')
+    <link rel="stylesheet" href="{{ asset('assets/plugins/Select2/css/select2.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/plugins/Select2/css/select2-bootstrap-5-theme.min.css') }}" />
+@endsection
 @section('content')
     <div class="bg-light rounded p-3">
         <div class="form-group py-2">
             <label for="selectProduct" class="mb-2">Cari Kode Barang</label>
             <div class="d-flex">
-                <input type="text" class="form-control" id="codeInput" placeholder="Masukkan Kode Barang">
+                <select name="" id="codeInput" class="form-select" style="width: 100%;">
+                    <option value=""></option>
+                    @foreach ($products as $product)
+                        <option value="{{ $product->code }}">{{$product->code}} | {{ $product->name }}</option>
+                    @endforeach
+                </select>
                 <button class="btn btn-primary" type="button" id="searchBtn"><i class="bi bi-search"></i></button>
             </div>
         </div>
@@ -42,7 +51,14 @@
     {{-- </div> --}}
 @endsection
 @push('scripts')
+    <script src="{{ asset('assets/plugins/Select2/js/select2.min.js') }}"></script>
     <script>
+        $(function(){
+            $('#codeInput').select2({
+                theme: 'bootstrap-5',
+            });
+        });
+
         const currentUrl = '{{ url()->current() }}';
         $('#searchBtn').on('click', function() {
             let codeVal = $('#codeInput').val();

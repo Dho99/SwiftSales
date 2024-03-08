@@ -30,7 +30,7 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $products = Product::all()->take(6);
+        $products = Product::all();
 
         if($request->ajax()){
             return response()->json(['data' => $products], 200);
@@ -57,7 +57,7 @@ class ProductController extends Controller
                 'description' => strip_tags($product->description),
                 'supplier' => $product->supplier->name,
                 'category' => $product->category->name,
-                'images' => json_decode($product->images),
+                'images' => $product->images,
                 'stock' => $product->stock,
                 'buyPrice' => $product->buyPrice,
                 'sellPrice' => $product->sellPrice,
@@ -87,9 +87,12 @@ class ProductController extends Controller
     }
 
     public function stockInView(){
+        $products = Product::all();
         return view('Admin.Product.stock-in', [
             'title' => 'Stock-in Produk',
             'recomendations' => Product::where('stock', '<=', 10)->get(),
+            'products' => $products
+
         ]);
     }
 
@@ -109,17 +112,11 @@ class ProductController extends Controller
             'sellPrice' => 'required|gt:buyPrice',
             'expiredDate' => 'required|after:today'
         ]);
-        // $data = $request->all();
+
         $data['userId'] = $this->userData->authUser()->id;
         $data['batch'] = 0;
         $data['stock'] = 0;
-        // $data['imagesArr'] = [];
 
-        // foreach(json_decode($data['jsonImages']) as $image){
-        //     $data['imagesArr'][] = '/storage/uploads/productImage/'.$image;
-        // }
-
-        // $data['images'] = json_encode($data['imagesArr']);
 
         try{
             Product::create($data);
@@ -262,8 +259,14 @@ class ProductController extends Controller
             Storage::delete($imageReplacedStoragePath);
         }
 
+        $productId = $product->id;
 
         $product->delete();
+
+        Product::deleted(function($product) {
+            Transaction::whereJsonContains('productId', $productId)->delete();
+        });
+
         return response()->json(['message' => 'Data Produk berhasil dihapus'], 200);
     }
 }

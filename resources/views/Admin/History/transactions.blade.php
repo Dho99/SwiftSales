@@ -57,6 +57,7 @@
         $().ready(function(){
             findDatas();
         });
+
         function findDatas(){
             findData(currentUrl).then(function(response){
 
@@ -111,14 +112,10 @@
                 swalError(xhr.responseText);
             });
         };
-        // function findData()
-
-
 
         function showDetails(id){
             findData(currentUrl+'/'+id).then(function(response){
                 let i = 0;
-                // console.log(userLevel);
                 const data = response.data;
                 trxmodal.modal('show');
                 trxmodal.find('#staticBackdropLabel').text('Detail Transaksi '+data.code);
@@ -167,15 +164,15 @@
                     </div>
                 </div>
                 `);
-                if(data.status === 'Success'){
-                    if(userLevel === 'Admin'){
+                // if(data.status === 'Success'){
+                    // if(userLevel === 'Admin'){
                         trxmodal.find('#cancelTransaction').removeClass('d-none').attr('onclick', `deleteTransaction('${id}')`);
-                        trxmodal.find('.modal-footer a').removeClass('d-none').attr('href', `/admin/transactions/print/${id}`);
-                    }
-                }else{
-                    trxmodal.find('#cancelTransaction').addClass('d-none');
-                    trxmodal.find('.modal-footer a').addClass('d-none');
-                }
+                        trxmodal.find('.modal-footer a').removeClass('d-none').attr('href', `/transactions/print/${id}`);
+                    // }
+                // }else{
+                //     trxmodal.find('#cancelTransaction').addClass('d-none');
+                //     trxmodal.find('.modal-footer a').addClass('d-none');
+                // }
             });
         }
 
