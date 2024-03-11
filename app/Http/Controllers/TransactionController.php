@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Product;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -18,8 +19,8 @@ class TransactionController extends Controller
     {
         $endDate = now();
         $startDate = now()->subdays(30)->endOfDay();
-        $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->with('user', 'customer')->get();
         if($request->ajax()){
+            $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->with('user', 'customer')->get();
             return response()->json(['transactions' => $transactions]);
         }else{
             return view('Admin.History.transactions', [
@@ -149,6 +150,23 @@ class TransactionController extends Controller
         //
     }
 
+    public function filter(Request $request)
+    {
+        if($request->ajax()){
+            if(isset($request->startDate) && isset($request->endDate)){
+                $startDate = Carbon::parse($request->startDate);
+                $endDate = Carbon::parse($request->endDate);
+
+                return response()->json(['startDate' => $startDate, 'endDate' => $endDate], 200);
+            }else{
+                return response('Gagal mendapatkan data', 400);
+            }
+        }else{
+            return response('Gagal mendapatkan data', 400);
+        }
+
+    }
+
 
 
     /**
@@ -177,7 +195,9 @@ class TransactionController extends Controller
                 ]);
             }
 
-            $transaction->update(['status' => 'Canceled']);
+            $transaction->update([
+                'status' => 'Canceled'
+            ]);
         }
 
         return response()->json(['message' => 'Transaksi berhasil dibatalkan, stok produk telah dikembalikan'], 200);

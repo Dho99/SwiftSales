@@ -31,6 +31,7 @@ function swalConfirm(message){
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
+            cancelButtonText: "Tidak",
             confirmButtonText: "Ya"
           }).then((result) => {
             if (result.isConfirmed) {
@@ -55,6 +56,7 @@ function swalConfirmWithoutDelete(message){
             icon: "question",
             showCancelButton: true,
             cancelButtonColor: "#d33",
+            cancelButtonText: "Tidak",
             confirmButtonText: "Ya"
           }).then((result) => {
             if (result.isConfirmed) {

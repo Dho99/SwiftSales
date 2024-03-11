@@ -67,6 +67,7 @@ Route::middleware('auth')->group(function(){
     Route::resource('products', ProductController::class);
 
 
+    Route::post('/transactions/filter', [TransactionController::class, 'filter']);
     Route::resource('transactions', TransactionController::class);
 
     Route::get('/transactions/print/{transaction}', [TransactionController::class, 'print']);

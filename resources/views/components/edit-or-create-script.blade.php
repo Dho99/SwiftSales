@@ -40,6 +40,7 @@
                     success: function(response) {
                         // Hapus file dari tampilan Dropzone hanya jika berhasil dihapus dari server
                         myDropzone.removeFile(file);
+
                         removeFromArray(response.file);
                     },
                     error: function(xhr, status, error) {

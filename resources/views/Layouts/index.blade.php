@@ -26,6 +26,7 @@
         display: none !important;
     }
 </style>
+@yield('styles')
 
 <body class="bg-secondary bg-opacity-25 overflow-hidden">
 
@@ -109,36 +110,16 @@
 
 
                         @elseif(auth()->user()->roles === 'Cashier')
-                        <a href="/transactions/create"
-                            class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Create Transactions' ? 'active' : '' }}"><i
-                                class="bi bi-wallet2 me-3"></i><span class="fs-5">Transaksi</span>
-                        </a>
-
-                        <a href="/products/stock/in"
-                            class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
-                            class="bi bi-box-seam me-3"></i> <span class="fs-5">Stock-in Produk</span>
-                        </a>
-
-
-                            {{-- <a href="javascript:void(0)" id="sidedropmenu1"
-                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Daftar Produk' || $title == 'Tambah Produk' || $title == 'Stock-in Produk' ? 'active' : '' }}"><i
-                                    class="bi bi-box-seam me-3"></i> <span class="fs-5">Produk</span> <i
-                                    class="bi bi-chevron-down ms-auto" id="arrow1"></i></i>
+                            <a href="/transactions/create"
+                                class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Create Transactions' ? 'active' : '' }}"><i
+                                    class="bi bi-wallet2 me-3"></i><span class="fs-5">Transaksi</span>
                             </a>
-                            <div id="sidedropcontent1" class="ps-2 d-none">
-                                <a href="/products"
-                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Daftar Produk' ? 'active' : '' }}"><i
-                                        class="bi bi-dash me-3"></i> <span class="fs-5">Daftar Produk</span>
-                                </a>
-                                <a href="/products/create"
-                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Tambah Produk' ? 'active' : '' }}"><i
-                                        class="bi bi-dash me-3"></i> <span class="fs-5">Tambah Produk</span>
-                                </a>
-                                <a href="/products/stock/in"
-                                    class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
-                                        class="bi bi-dash me-3"></i> <span class="fs-5">Stock-in Produk</span>
-                                </a>
-                            </div> --}}
+
+                            <a href="/products/stock/in"
+                                class="btn rounded text-light text-start d-flex align-items-center mb-1 sidebtn {{ $title == 'Stock-in Produk' ? 'active' : '' }}"><i
+                                class="bi bi-box-seam me-3"></i> <span class="fs-5">Stock-in Produk</span>
+                            </a>
+
 
                             <a href="javascript:void(0)" id="sidedropmenu2"
                                 class="btn rounded text-light w-100 text-start d-flex mb-2 align-items-center sidebtn {{ $title == 'Riwayat Transaksi' || $title == 'StockIn History' ? 'active' : '' }}"><i
@@ -172,7 +153,7 @@
                     <div class="container">
                         <div class="collapse navbar-collapse" id="navbarSupportedContent">
                             <i class="bi bi-list d-lg-none d-md-block h3 mb-0" onclick="showHideSidebar()"></i>
-                            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                            <ul class="navbar-nav ms-auto mb-0">
                                 <li class="nav-item dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" role="button"
                                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -256,6 +237,7 @@
         const loader = $('#loader');
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        // const currentUrl = '{{url()->current()}}';
 
         $('a#sidedropmenu1').on('click', function() {
             $('#sidedropcontent1').toggleClass('d-none');

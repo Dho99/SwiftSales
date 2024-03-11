@@ -215,9 +215,6 @@
 
 
 
-
-
-
         function createCustomer(){
             $('#createUserModal').modal('show');
         }
@@ -255,7 +252,7 @@
             if (val) {
                 wrapper.empty();
                 findData(url).then(function(response) {
-                    showProductDetails(response.data);
+                    appendToCart(response.data);
                 }).catch(function(xhr, error) {
                     swalError(xhr.responseText);
                     console.log(error.message);
@@ -264,43 +261,6 @@
                 console.log(null);
             }
         });
-
-        function showProductDetails(data) {
-            wrapper.append(`
-                <div class="card d-flex justify-content-center">
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="${data.images[0]}" class="img-fluid rounded-start h-100"
-                                alt="Product Image">
-                        </div>
-                        <div class="col-md-8">
-                            <div class="card-body">
-                                <h5 class="card-title">${data.code} | ${data.name}</h5>
-                                <div class="card-text my-3">
-                                    <table class="table-responsive">
-                                        <thead>
-                                            <tr>
-                                                <th>Harga :</th>
-                                                <td>${formatToRupiah(data.sellPrice)}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Stok :</th>
-                                                <td>${data.stock}</td>
-                                            </tr>
-                                        </thead>
-                                    </table>
-                                </div>
-                                <div class="card-text row d-flex mx-auto">
-                                    <div class="col-lg-6 col-md-6 col-6 ms-auto">
-                                        <button class="btn btn-primary w-100" onclick="addToCart('${data.id}')"><i class="bi bi-cart-plus me-2"></i>Tambah</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
 
         const coWrapper = $('#checkoutBarWrapper');
 
@@ -316,21 +276,6 @@
         }
 
 
-        function addToCart(id) {
-            // reset();
-            let url = productUrl + id;
-            findData(url).then(function(response) {
-                appendToCart(response.data);
-                $('#selectProduct').val('').change();
-                $('#trashBtn, #prosesTransaksi').removeClass('disabled');
-                wrapper.empty();
-            }).catch(function(xhr, error) {
-                swalError(xhr.responseText);
-            });
-        }
-
-        // let idProductArr = [];
-
         function appendToCart(data) {
             if (data.id in transactions) {
                 addQty(data.id);
@@ -338,6 +283,7 @@
                 if(data.stock < 1){
                     swalError('Stok Produk sedang Kosong, Tidak dapat menambahkan ke keranjang');
                 }else{
+                    $('#trashBtn, #prosesTransaksi').removeClass('disabled');
                     transactions[data.id] = {
                         productId: data.id,
                         code: data.code,
@@ -417,7 +363,6 @@
             } else {
                 nVal = cVal -= 1;
                 transactions[id].qty = nVal;
-                // console.log(transactions);
                 addToTable();
             }
             productQty.val(nVal);

@@ -1,2 +1,2 @@
-1. FIltering history by month
-2. FInd index then remove from array in uploadedFile array in create product
+1. FIltering history by month - WIP
+2. Move from cari data product wrap into basket
