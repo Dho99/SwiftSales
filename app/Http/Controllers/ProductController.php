@@ -196,11 +196,6 @@ class ProductController extends Controller
                 'imageArray' => json_decode($product->images),
             ]);
         }
-        // if($request->ajax()){
-        //     return response()->json(['data' => $product], 200);
-        // }else{
-        //     abort(400);
-        // }
     }
 
     /**

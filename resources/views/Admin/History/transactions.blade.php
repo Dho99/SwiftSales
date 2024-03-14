@@ -1,20 +1,54 @@
 @extends('Layouts.index')
 @section('styles')
     <style>
-        #filterBtn{
+        #filterBtn {
             width: 70px !important;
         }
 
-        @media screen and (width < 990px){
-            #filterBtn{
+        @media screen and (width < 990px) {
+            #filterBtn {
                 width: 100% !important;
             }
         }
     </style>
 @endsection
 @section('content')
-    <div class="container bg-light rounded py-3 px-4">
+    <div class="mb-2 d-lg-container-fluid container m-auto p-0">
         <div class="row">
+            <div class="col-lg-4 col-12">
+                <div class="bg-light rounded row px-1 py-3 m-1">
+                    <div class="col-12">
+                        <h5>Jumlah Transaksi</h5>
+                    </div>
+                    <div class="col-12">
+                        <h5 class="fw-bold" id="ownTransactions"></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-6">
+                <div class="bg-light rounded row px-1 py-3 m-1">
+                    <div class="col-12">
+                        <h5>Total Pendapatan</h5>
+                    </div>
+                    <div class="col-12">
+                        <h5 class="fw-bold" id="ownIncomes"></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-6">
+                <div class="bg-light rounded row px-1 py-3 m-1">
+                    <div class="col-12">
+                        <h5>Total Profit</h5>
+                    </div>
+                    <div class="col-12">
+                        <h5 class="fw-bold" id="ownProfits"></h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container bg-light rounded py-3 px-4">
+        <div class="row  border-bottom mb-3">
             <div class="ms-auto col-lg-6 col-12">
                 <div class="text-end mb-2">
                     Urutkan berdasarkan Tanggal
@@ -22,11 +56,11 @@
                 <div class="d-lg-flex d-md-block mb-3 ">
                     <div class="input-group">
                         <span class="input-group-text">Dari</span>
-                        <input type="date" class="form-control"  id="startDate">
+                        <input type="date" class="form-control" id="startDate">
                     </div>
                     <div class="input-group">
                         <span class="input-group-text">Hingga</span>
-                        <input type="date" class="form-control"  id="endDate">
+                        <input type="date" class="form-control" id="endDate">
                     </div>
                     <button class="btn btn-primary" id="filterBtn">Filter</button>
                 </div>
@@ -39,8 +73,9 @@
                     <th>Kode Transaksi</th>
                     <th>Nama Pelanggan</th>
                     <th>Jumlah Pembelian</th>
+                    <th>Profit</th>
                     <th>Total</th>
-                    <th>Status</th>
+                    {{-- <th>Status</th> --}}
                     <th>Tanggal Transaksi</th>
                     <th>Aksi</th>
                 </tr>
@@ -82,66 +117,73 @@
         const year = filter.attr('name');
         const month = filter.val();
 
-        filter.on('change', function() {
-            findDatas();
-        })
-
         $().ready(function() {
             findDatas();
         });
 
-        function renderPrintables(data){
-            printableWColumns('#transactionHistories', data, [{
-                data: null,
-                render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }
-            },
-            {
-                data: "code"
-            },
-            {
-                data: "customer.name"
-            },
-            {
-                data: null,
-                render: function(data, type, row){
-                    return `<button class="badge btn btn-${row.status == 'Success' ? 'success' : 'danger'}">${row.status}</button>`
-                }
-            },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    const quantities = JSON.parse(row.quantity);
-                    return quantities.length + ' Varian';
-                }
-            },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    return formatToRupiah(row.subtotal);
-                }
-            },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    return formatDate(row.created_at);
-                }
-            },
-            {
-                data: null,
-                render: function(data, type, row) {
-                    return `
+        function renderPrintables(data, incomes, profits) {
+            $('#ownIncomes').text(formatToRupiah(incomes));
+            $('#ownProfits').text(formatToRupiah(profits));
+            $('#ownTransactions').text(data.length);
+            printableWColumns('#transactionHistories', data, [
+                {
+                    data: null,
+                    render: function(data, type, row, meta) {
+                        return meta.row + meta.settings._iDisplayStart + 1;
+                    }
+                },
+                {
+                    data: "code"
+                },
+                {
+                    data: "customer.name"
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        const quantities = JSON.parse(row.quantity);
+                        return quantities.length + ' Varian';
+                    }
+                },
+                {
+                    data: null,
+                    render: function(data, type, row){
+                        return formatToRupiah(row.profit);
+                    }
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return formatToRupiah(row.subtotal);
+                    }
+                },
+                // {
+                //     data: null,
+                //     render: function(data, type, row) {
+                //         return `<button class="badge btn btn-${row.status == 'Success' ? 'success' : 'danger'}">${row.status}</button>`
+                //     }
+                // },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return formatDate(row.created_at);
+                    }
+                },
+                {
+                    data: null,
+                    render: function(data, type, row) {
+                        return `
                     <button class="badge btn btn-sm btn-primary" onclick="showDetails('${row.id}')"><i class="bi bi-eye"></i></button>
                     `;
-                }
-            },
-        ]);
+                    }
+                },
+            ]);
         }
 
         function findDatas() {
             findData(currentUrl).then(function(response) {
-                renderPrintables(response.transactions);
+                renderPrintables(response.transactions, response.totalTransactions, response.calculateProfits);
+                trxmodal.modal('hide');
             }).then(function(xhr, error) {
                 swalError(xhr.responseText);
             });
@@ -180,13 +222,13 @@
                             <tbody>
                             ${data.product.map((product, index) =>
                                 `
-                                        <tr>
-                                            <td>${i+=1}</td>
-                                            <td>${product.name}</td>
-                                            <td>${data.qty[index]}</td>
-                                            <td>${formatToRupiah(data.total[index])}</td>
-                                        <tr>
-                                    `)}
+                                                    <tr>
+                                                        <td>${i+=1}</td>
+                                                        <td>${product.name}</td>
+                                                        <td>${data.qty[index]}</td>
+                                                        <td>${formatToRupiah(data.total[index])}</td>
+                                                    <tr>
+                                                `)}
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -198,9 +240,12 @@
                     </div>
                 </div>
                 `);
-                trxmodal.find('#cancelTransaction').removeClass('d-none').attr('onclick',
-                    `deleteTransaction('${id}')`);
-                trxmodal.find('.modal-footer a').removeClass('d-none').attr('href', `/transactions/print/${id}`);
+                // if (data.status !== 'Canceled') {
+                //     trxmodal.find('#cancelTransaction').removeClass('d-none').attr('onclick',
+                //         `deleteTransaction('${id}')`);
+                    trxmodal.find('.modal-footer a').removeClass('d-none').attr('href',
+                        `/transactions/print/${id}`);
+                // }
             });
         }
 
@@ -209,33 +254,34 @@
             trxmodal.find('.modal-body').empty();
         });
 
-        function deleteTransaction(id) {
-            swalConfirm('Apakah anda yakin akan membatalkan transaksi ini ?').then(function(result) {
-                if (result) {
-                    deleteData(currentUrl + `/${id}`, null).then(function(response) {
-                        swalSuccess(response.message);
-                        setTimeout(() => {
-                            findDatas();
-                        }, 700);
-                    }).catch(function(xhr) {
-                        swalError(xhr.responseText);
-                    })
-                }
-            });
-        }
+        // function deleteTransaction(id) {
+        //     swalConfirm('Apakah anda yakin akan membatalkan transaksi ini ?').then(function(result) {
+        //         if (result) {
+        //             deleteData(currentUrl + `/${id}`, null).then(function(response) {
+        //                 swalSuccess(response.message);
+        //                 setTimeout(() => {
+        //                     findDatas();
+        //                 }, 700);
+        //             }).catch(function(xhr) {
+        //                 swalError(xhr.responseText);
+        //             })
+        //         }
+        //     });
+        // }
 
-        $('#filterBtn').on('click', function(){
+        $('#filterBtn').on('click', function() {
             const startDate = $('#startDate').val();
             const endDate = $('#endDate').val();
 
 
-            if(startDate.length > 1 && endDate.length > 1){
+            if (startDate.length > 1 && endDate.length > 1) {
                 const formData = new FormData();
                 formData.append('startDate', startDate);
                 formData.append('endDate', endDate);
-                storeData(currentUrl+'/filter', formData).then(function(response){
-                    console.log(response);
-                }).catch(function(xhr){
+                storeDataNoReset(currentUrl + '/filter', formData).then(function(response) {
+                    renderPrintables(response.transactions, response.totalTransactions, response.calculateProfits);
+                    Swal.close();
+                }).catch(function(xhr) {
                     swalError(xhr.responseText);
                 });
             }

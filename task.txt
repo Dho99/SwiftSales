@@ -1,2 +1,1 @@
-1. FIltering history by month - WIP
-2. Move from cari data product wrap into basket
+- fix reset button filtering

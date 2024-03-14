@@ -212,7 +212,7 @@
                             </select>
                         @endif --}}
                     </div>
-                    <div class="container my-3 py-3 bg-light w-25 position-absolute top-50 start-50 translate-middle rounded d-none" id="loader">
+                    <div class="container my-3 py-3 bg-light w-25 position-absolute top-50 start-50 translate-middle rounded d-none z-3 shadow" id="loader">
                         <div class="dot-elastic  d-flex mx-auto"></div>
                     </div>
                     @yield('content')
@@ -277,7 +277,7 @@
                     processData: false,
                     contentType: false,
                     beforeSend: function() {
-                        swalBeforeSend();
+                        loader.removeClass('d-none');
                     },
                     success: function(response) {
                         resolve(response);
@@ -286,6 +286,7 @@
                         reject(xhr, error);
                     }
                 }).done(function() {
+                    loader.addClass('d-none');
                     resetAllInput();
                     Swal.close();
                 });
@@ -303,8 +304,9 @@
                     data: formData,
                     processData: false,
                     contentType: false,
-                    // beforeSend: function() {
-                    // },
+                    beforeSend: function() {
+                        loader.removeClass('d-none');
+                    },
                     success: function(response) {
                         resolve(response);
                     },
@@ -312,6 +314,7 @@
                         reject(xhr, error);
                     }
                 }).done(function() {
+                    loader.addClass('d-none');
                     Swal.close();
                 });
             });

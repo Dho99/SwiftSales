@@ -23,8 +23,7 @@ class DashboardController extends Controller
             'customers' => User::where('roles', 'Customer')->get(),
             'products' => $products->count(),
             'suppliers' => Supplier::count(),
-            'suceedTransactions' => $transactions->where('status', 'Success')->count(),
-            'canceledTransactions' => $transactions->where('status', 'Canceled')->count()
+            'totalProfitByMonth' => Transaction::whereMonth('created_at', Carbon::now()->format('m'))->sum('profit'),
         ]);
     }
 
@@ -46,12 +45,14 @@ class DashboardController extends Controller
                 if ($transactions->has($hour)) {
                     $transactionArr[] = [
                         'count' => $transactions[$hour]->count(),
-                        'total' => $transactions[$hour]->sum('subtotal')
+                        'total' => $transactions[$hour]->sum('subtotal'),
+                        'profits' => $transactions[$hour]->sum('profit'),
                     ];
                 } else {
                     $transactionArr[] = [
                         'count' => 0,
-                        'total' => 0
+                        'total' => 0,
+                        'profits' => 0,
                     ];
                 }
             }

@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('stock');
             $table->integer('buyPrice');
             $table->integer('sellPrice');
+            // $table->boolean('isExpired');
             $table->date('expiredDate');
             $table->unsignedBigInteger('userId');
             $table->timestamps();

@@ -1,6 +1,6 @@
 @extends('Layouts.index')
 @section('content')
-<div class="position-absolute z-3 p-2 d-flex flex-column" style="right: 20px; bottom: 10px;">
+<div class="position-fixed z-3 p-2 d-flex flex-column" style="right: 20px; bottom: 10px;">
     <button class="btn btn-danger shadow-lg border filterbtn d-none" id="resetFilterButton">
         <span class="fw-bold h5"><i class="bi bi-x-circle me-2"></i>Reset</span>
     </button>
@@ -13,8 +13,8 @@
     @if (isset($products[0]))
         <div id="cardProductWrapper" class="row d-lg-container d-md-container mt-3">
             @foreach ($products as $key => $product)
-                <div class="col-lg-4 col-md-6 col-sm-10 mx-lg-0 mx-auto mb-3" id="productCardWrapper">
-                    <div class="card card bg-light shadow-sm mx-lg-0 mx-md-2" id="productCard" >
+                <div class="col-lg-3 col-md-4 col-sm-10 mx-lg-0 mx-auto mb-3" id="productCardWrapper">
+                    <div class="card card bg-light shadow-sm mx-lg-0 mx-md-2" id="productCard">
                         <div id="carouselExampleIndicators{{ $key }}" class="carousel slide" data-bs-ride="carousel">
                             <div class="carousel-inner">
                                 @foreach (json_decode($product->images) as $image)
@@ -38,11 +38,11 @@
                             {{-- @endif --}}
                         </div>
 
-                        <div class="card-body bg-body rounded">
+                        <div class="card-body rounded">
                             <table class="table table-responsive" id="productable">
                                 <tr>
                                     <th>Kode Produk:</th>
-                                    <td id="productName">{{ $product->code }}</td>
+                                    <td id="productCode">{{ $product->code }}</td>
                                 </tr>
                                 <tr>
                                     <th>Nama Produk:</th>
@@ -50,20 +50,16 @@
                                 </tr>
                                 <tr>
                                     <th>Stok</th>
-                                    <td id="productSellPrice">{{$product->stock}}</td>
-                                </tr>
-                                {{-- <tr>
-                                    <th>Harga Jual:</th>
-                                    <td id="productSellPrice">@currency($product->sellPrice)</td>
+                                    <td id="productStock">{{$product->stock}}</td>
                                 </tr>
                                 <tr>
-                                    <th>Kategori</th>
-                                    <td id="productCategory">{{ $product->category->name }}</td>
+                                    <th>Status</th>
+                                    @if($product->expiredDate <= now())
+                                        <td id="productStatus" class="text-danger fw-bolder">Expired</td>
+                                    @else
+                                        <td id="productStatus" class="text-success fw-bolder">Normal</td>
+                                    @endif
                                 </tr>
-                                <tr>
-                                    <th>Supplier</th>
-                                    <td id="productSupplier">{{ $product->supplier->name }}</td>
-                                </tr> --}}
                             </table>
                             <div class="row d-flex gap-2">
                                 <div class="col-5">
@@ -109,6 +105,7 @@
                     <option value="">Pilih opsi Filtering</option>
                     <option value="productName">Nama</option>
                     <option value="productCode">Kode Produk</option>
+                    <option value="productStatus">Status Produk</option>
                 </select>
             </div>
             <div class="form-group" id="selectResult">
@@ -126,40 +123,11 @@
 
 @push('scripts')
     <script>
-        const host = '{{ url('/') }}';
+        const host = '{{ url("/") }}';
         const currentUrl = '{{ url()->current() }}';
         let totalProductShow = '/'+'{{count($products)}}';
         const wrapper = $('.card');
         let cardIndex = wrapper.length;
-
-        // $().ready(function(){
-        //     getResult();
-        // });
-
-        // let scrollValue = $(document).height();
-        // scrollValue -= 200;
-
-        // $('div').scroll(function() {
-        //     const wrapper = $('#cardProductWrapper');
-        //     if (wrapper.children().length < 6) {
-        //         scrollValue += 300;
-        //     }
-        //     if ($(this).scrollTop() >= scrollValue) {
-        //         if ($(document).width() <= 768) {
-        //             scrollValue += (scrollValue * 3);
-        //         } else {
-        //             scrollValue += scrollValue;
-        //         }
-
-        //         findData(currentUrl)
-        //             .then(function(response) {
-        //                 appendCard(response.data);
-        //             })
-        //             .catch(function(xhr) {
-        //                 swalError(xhr.responseText);
-        //             });
-        //     }
-        // });
 
         function findDatas(){
             findData(currentUrl).then(function(response) {
@@ -173,7 +141,6 @@
             $('#cardProductWrapper').empty();
             datas.map((data, index) => {
                 cardIndex+=1;
-                // console.log(data);
                 $('#cardProductWrapper').append(`
                     <div class="col-lg-4 col-md-6 col-sm-10 mx-lg-0 mx-auto mb-3" id="productCardWrapper">
                         <div class="card card bg-light shadow-sm mx-lg-0 mx-md-2" id="productCard">
@@ -195,7 +162,7 @@
                                     <span class="visually-hidden">Next</span>
                                 </button>
                             </div>
-                            <div class="card-body bg-body rounded">
+                            <div class="card-body rounded bg-danger">
                                 <table class="table table-responsive" id="productable">
                                     <tr>
                                         <th>Kode Produk:</th>
@@ -227,7 +194,9 @@
 
 
         $('#resetFilterButton').on('click', function(){
-            $('#selectResult input').val('');
+            // alert('reset');
+            $('#filterByCategory').val('').change();
+            // $('#selectResult').val('');
             doFiltering();
         });
 
@@ -246,35 +215,49 @@
                     filterFormWrapper.append(`
                         <input type="text" name="" id="supplier" class="form-control" placeholder="Masukkan Keywords">
                     `);
+                }else if(selectedFilterMethod === 'productStatus'){
+                    filterFormWrapper.append(`
+                    <select class="form-select" id="statusProduct">
+                        <option selected>Pilih Status Product</option>
+                        <option value="normal">Normal</option>
+                        <option value="expired">Kadaluarsa</option>
+                    </select>
+                    `);
                 }
             }
         }
 
 
         function doFiltering() {
-            let keywords = $('#selectResult input').val().toLowerCase();
+            let keywords = $('#selectResult input').val();
             let cards = $('#productCardWrapper .card');
             let category = $('#filterByCategory').val();
+            let status = $('select#statusProduct').val();
+
             $('#staticBackdrop').modal('hide');
             cards.each(function(index, card) {
                 let tableData;
-                if(category.length < 1){
+
+                if(category !== ''){
                     tableData = $(card).find('table#productable').text().toLowerCase();
                 }else{
                     tableData = $(card).find(`table#productable tbody tr td#${category}`).text().toLowerCase();
                 }
-                if (tableData.includes(keywords)) {
+
+                if (tableData.includes(keywords) || tableData.includes(status)) {
                     $(card).parent('#productCardWrapper').show();
-                } else {
+                }else{
                     $(card).parent('#productCardWrapper').hide();
                 }
+
+
             });
 
-            if(keywords.length < 1){
-                $('#resetFilterButton').addClass('d-none');
-            }else{
+            // if(keywords !== '' || status !== ''){
+                // $('#resetFilterButton').addClass('d-none');
+            // }else{
                 $('#resetFilterButton').removeClass('d-none');
-            }
+            // }
 
         }
 
@@ -283,29 +266,6 @@
             $('#staticBackdrop').modal('show');
         });
 
-
-
-        // function refreshCard(data) {
-        //     const atEmpty = $('#atEmptyData');
-        //     const wrapper = $('#cardProductWrapper');
-        //     wrapper.empty();
-        //     if (data.length < 1) {
-        //         atEmpty.html(`
-        //             <div class="container-fluid bg-light py-3 mx-auto rounded text-center fw-bold d-flex flex-column text-info-emphasis">
-        //                 <i class="bi bi-dropbox h1"></i>
-        //                 Tidak ada data produk
-        //             </div>
-        //         `);
-        //     } else {
-        //         Swal.close();
-        //         appendCard(data);
-        //     }
-        //     $('div').scrollTop(0);
-        //     findDatas();
-        //     scrollValue = $(document).height();
-        //     scrollValue -= 200;
-        //     console.log(scrollValue);
-        // }
 
 
         function deleteProduct(url, message) {
@@ -333,4 +293,4 @@
 
     </script>
 @endpush
-<script></script>
+

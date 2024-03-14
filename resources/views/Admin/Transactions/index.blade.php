@@ -424,6 +424,7 @@
 
             subtotal = grandTotal;
             $('#bill').val(subtotal);
+            $('#pay, #charge').val(0);
         }
 
         $('#prosesTransaksi').on('click', function(event) {

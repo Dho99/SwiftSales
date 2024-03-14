@@ -7,10 +7,10 @@
             <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
                 <div class="row">
                     <div class="col-12">
-                        <h6 class="">Jumlah Transaksi</h6>
+                        <h6 class="">Profit Perbulan</h6>
                     </div>
                     <div class="col-12">
-                        <h4 class="fw-bold">{{ $countTransactions }}</h4>
+                        <h4 class="fw-bold">@currency($totalProfitByMonth)</h4>
                     </div>
                 </div>
             </div>
@@ -63,56 +63,44 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 col-12 row m-0 p-0">
-        <div class="col-12">
-            <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
+        <div class="col-lg-4 col-12 m-0 p-0">
+            <div class="row m-0 p-0 w-100">
                 <div class="col-12">
-                    <h6 class="">Pelanggan Terdaftar</h6>
+                    <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
+                        <div class="col-12">
+                            <h6 class="">Pelanggan Terdaftar</h6>
+                        </div>
+                        <div class="col-12">
+                            <h4 class="fw-bold">{{ $customers->count() }}</h4>
+                        </div>
+                    </div>
                 </div>
                 <div class="col-12">
-                    <h4 class="fw-bold">{{ $customers->count() }}</h4>
+                    <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
+                        <div class="col-lg-12">
+                            <h6 class="">Jumlah Supplier</h6>
+                        </div>
+                        <div class="col-12">
+                            <h4 class="fw-bold">{{ $suppliers }}</h4>
+                        </div>
+                    </div>
                 </div>
+                <div class="col-12">
+                    <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
+                        <div class="col-12">
+                            <h6 class="">Jumlah Transaksi</h6>
+                        </div>
+                        <div class="col-12">
+                            <h4 class="fw-bold">{{ $countTransactions }}</h4>
+                        </div>
+                    </div>
 
+                </div>
             </div>
         </div>
-        <div class="col-12">
-            <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
-                <div class="col-lg-12">
-                    <h6 class="">Jumlah Supplier</h6>
-                </div>
-                <div class="col-12">
-                    <h4 class="fw-bold">{{ $suppliers }}</h4>
-                </div>
-            </div>
-
-        </div>
-        <div class="col-12">
-            <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
-                <div class="col-12">
-                    <h6 class="">Pesanan Sukses</h6>
-                </div>
-                <div class="col-12">
-                    <h4 class="fw-bold">{{ $suceedTransactions }}</h4>
-                </div>
-
-            </div>
-        </div>
-        <div class="col-12">
-            <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
-                <div class="col-12">
-                    <h6 class="">Pesanan Gagal</h6>
-                </div>
-                <div class="col-12">
-                    <h4 class="fw-bold">{{ $canceledTransactions }}</h4>
-                </div>
-            </div>
-
-        </div>
-    </div>
-    {{-- </div> --}}
+        {{-- </div> --}}
     </div>
 @endsection
-
 
 
 @push('scripts')
@@ -120,7 +108,8 @@
 
     <script>
         let labels;
-        let datas = [];
+        const datas = [];
+        const profits = [];
         const ctx = document.getElementById('myChart');
 
         function renderChart() {
@@ -129,12 +118,18 @@
                 responsive: true,
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: 'Ditampilkan berdasarkan Jam',
-                        data: datas,
-                        borderWidth: 1,
-                        fill: true,
-                    }]
+                    datasets: [
+                        {
+                            label: 'Nominal',
+                            data: datas,
+                            // fill: true,
+                        },
+                        {
+                            label: 'Profit',
+                            data: profits,
+                            // fill: true
+                        }
+                    ]
                 },
                 options: {
                     scales: {
@@ -151,6 +146,7 @@
                 labels = response.hours;
                 response.transactions.map(data => {
                     datas.push(data.total);
+                    profits.push(data.profits);
                 });
                 setTimeout(() => {
                     renderChart();

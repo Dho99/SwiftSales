@@ -20,6 +20,7 @@ return new class extends Migration
             $table->json('quantity');
             $table->json('total');
             $table->integer('subtotal');
+            $table->integer('profit');
             $table->enum('status', ['Process', 'Success', 'Canceled']);
             $table->timestamps();
 

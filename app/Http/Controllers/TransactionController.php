@@ -17,11 +17,13 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
-        $endDate = now();
-        $startDate = now()->subdays(30)->endOfDay();
+        // $endDate = now();
+        // $startDate = now()->subdays(30)->endOfDay();
         if($request->ajax()){
-            $transactions = Transaction::whereBetween('created_at', [$startDate, $endDate])->with('user', 'customer')->get();
-            return response()->json(['transactions' => $transactions]);
+            $transactions = Transaction::whereMonth('created_at', now()->format('m'))->with('user', 'customer')->get();
+            $totalTransactions = $transactions->sum('subtotal');
+            $calculateProfits = $transactions->sum('profit');
+            return response()->json(['transactions' => $transactions, 'totalTransactions' => $totalTransactions, 'calculateProfits' => $calculateProfits], 200);
         }else{
             return view('Admin.History.transactions', [
                 'title' => 'Riwayat Transaksi'
@@ -29,13 +31,6 @@ class TransactionController extends Controller
         }
     }
 
-    // public function filterByMonth(Request $request, $month, $year)
-    // {
-    //     $transactions = Transaction::whereMonth('created_at', $month)->whereYear('created_at',$year)->with('user', 'customer')->get();
-    //     if($request->ajax()){
-    //         return response()->json(['transactions' => $transactions]);
-    //     }
-    // }
 
     /**
      * Show the form for creating a new resource.
@@ -57,31 +52,20 @@ class TransactionController extends Controller
         if($request->ajax()){
             $data = $request->all();
             $checkUser = User::where('id', $request->customerId)->first();
-            if(isset($checkUser)){
-                $data['customerId'] = $checkUser->id;
-            }else{
-                $newUser = User::create([
-                    'name' => $request->customerId,
-                    'code' => mt_rand(0, 9999),
-                    'telephone' => fake()->phoneNumber(),
-                    'profilePhoto' => fake()->imageUrl(640, 480, 'animals', true),
-                    'roles' => 'Customer',
-                    'email' => fake()->safeEmail(),
-                    'password' => Hash::make('password')
-                ]);
-                $data['customerId'] = $newUser->id;
-            }
+            $data['customerId'] = $checkUser->id;
             $data['userId'] = auth()->user()->id;
             $data['status'] = 'Success';
             $data['code'] = 'TRXN'.mt_rand(0, 9999999999);
+            $data['gross'] = 0;
             try{
-
                 foreach(json_decode($data['productId']) as $key => $product){
                     $getModel = Product::where('id', $product)->first();
                     $currentStock = $getModel->stock;
                     $calculateStock = $currentStock -= json_decode($data['quantity'])[$key];
                     $getModel->update(['stock' => $calculateStock]);
+                    $data['gross'] = $getModel->buyPrice * json_decode($data['quantity'])[$key];
                 }
+                $data['profit'] = intval($data['subtotal']) - intval($data['gross']);
                 $writeTransaction = Transaction::create($data);
                 return response()->json(['message' => 'Data Transaksi berhasil disimpan', 'id' => $writeTransaction->id],200);
             }catch(\Exception $e){
@@ -156,8 +140,10 @@ class TransactionController extends Controller
             if(isset($request->startDate) && isset($request->endDate)){
                 $startDate = Carbon::parse($request->startDate);
                 $endDate = Carbon::parse($request->endDate);
-
-                return response()->json(['startDate' => $startDate, 'endDate' => $endDate], 200);
+                $transactions = Transaction::with('user', 'customer')->whereBetween('created_at', [$startDate, $endDate])->get();
+                $totalTransactions = $transactions->sum('subtotal');
+                $calculateProfits = $transactions->sum('profit');
+                return response()->json(['transactions' => $transactions, 'totalTransactions' => $totalTransactions, 'calculateProfits' => $calculateProfits], 200);
             }else{
                 return response('Gagal mendapatkan data', 400);
             }
@@ -202,10 +188,6 @@ class TransactionController extends Controller
 
         return response()->json(['message' => 'Transaksi berhasil dibatalkan, stok produk telah dikembalikan'], 200);
 
-
-    }
-
-    public function history(Request $request){
 
     }
 }

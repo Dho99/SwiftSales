@@ -6,7 +6,7 @@
 @section('content')
     <div class="bg-light rounded p-3">
         <div class="form-group py-2">
-            <label for="selectProduct" class="mb-2">Cari Kode Barang</label>
+            <label for="selectProduct" class="mb-2">Cari Produk, Ketik nama produk diperbolehkan</label>
             <div class="d-flex">
                 <select name="" id="codeInput" class="form-select" style="width: 100%;">
                     <option value=""></option>
@@ -118,7 +118,7 @@
                     </div>
                     <div class="col-12 row gap-2 m-0 p-0">
                         <div class="col-lg-3 col-md-3 col-5">
-                            <a class="btn btn-secondary w-100" href="/admin/products">Kembali</a>
+                            <a class="btn btn-secondary w-100" href="/products">Kembali</a>
                         </div>
                         <div class="col-lg-3 col-md-3 col-5 ms-auto">
                             <button class="btn btn-primary w-100" onclick="updateStock()">Simpan</button>
