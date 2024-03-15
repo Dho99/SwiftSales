@@ -239,9 +239,10 @@
                 let tableData;
 
                 if(category !== ''){
-                    tableData = $(card).find('table#productable').text().toLowerCase();
-                }else{
                     tableData = $(card).find(`table#productable tbody tr td#${category}`).text().toLowerCase();
+                }else{
+                    keywords = '';
+                    tableData = $(card).find('table#productable').text().toLowerCase();
                 }
 
                 if (tableData.includes(keywords) || tableData.includes(status)) {
@@ -253,11 +254,11 @@
 
             });
 
-            // if(keywords !== '' || status !== ''){
-                // $('#resetFilterButton').addClass('d-none');
-            // }else{
+            if(keywords === '' || status === ''){
+                $('#resetFilterButton').addClass('d-none');
+            }else{
                 $('#resetFilterButton').removeClass('d-none');
-            // }
+            }
 
         }
 
