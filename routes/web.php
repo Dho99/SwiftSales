@@ -60,7 +60,6 @@ Route::middleware('auth')->group(function(){
         Route::get('/products/{skip}/get', 'ajaxRequestProduct');
         Route::get('/products/stock/in', 'stockInView')->name('stockinProduct');
         Route::get('/products/stock/in/{code}', 'ajaxGetProduct');
-        Route::get('/products/expired', 'expiredProduct');
         Route::post('/products/stock/in/store', 'storeNewStock');
     });
 

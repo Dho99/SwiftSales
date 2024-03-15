@@ -68,6 +68,16 @@
                 <div class="col-12">
                     <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
                         <div class="col-12">
+                            <h6 class="">Produk Kadaluarsa</h6>
+                        </div>
+                        <div class="col-12">
+                            <h4 class="fw-bold">{{ $productExpired }}</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="container bg-light shadow-sm rounded py-3 px-3 my-2">
+                        <div class="col-12">
                             <h6 class="">Pelanggan Terdaftar</h6>
                         </div>
                         <div class="col-12">

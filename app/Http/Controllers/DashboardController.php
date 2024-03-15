@@ -24,6 +24,7 @@ class DashboardController extends Controller
             'products' => $products->count(),
             'suppliers' => Supplier::count(),
             'totalProfitByMonth' => Transaction::whereMonth('created_at', Carbon::now()->format('m'))->sum('profit'),
+            'productExpired' => Product::where('expiredDate', '<=', now())->count(),
         ]);
     }
 
